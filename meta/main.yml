@@ -1,0 +1,11 @@
+galaxy_info:
+  author: Sergio Correia
+  description: Deploy tang server
+  galaxy_tags: ['system', 'tang', 'nbde', 'redhat', 'rhel', 'centos']
+  company: Red Hat, Inc.
+  license: MIT
+  min_ansible_version: 2.5
+  platforms:
+    - name: EL
+      versions: [7, 8]
+# vim:set ts=2 sw=2 et:

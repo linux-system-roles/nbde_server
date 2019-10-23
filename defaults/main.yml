@@ -1,0 +1,9 @@
+---
+# defaults file for linux-system-roles.tang
+
+tang_keygen: "/usr/libexec/tangd-keygen"
+tang_keydir: "/var/db/tang"
+rotate_keys: no
+state: started
+
+# vim:set ts=2 sw=2 et:
