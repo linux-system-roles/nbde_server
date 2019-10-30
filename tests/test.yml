@@ -1,6 +1,0 @@
----
-- hosts: localhost
-  remote_user: root
-  roles:
-    - tang
-# vim:set ts=2 sw=2 et:

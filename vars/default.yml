@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+---
+
+# Put internal variables here with values for unrecognized distributions.
+
+__nbde_server_package_list: []
+__nbde_server_service: ''
+
+# vim:set ts=2 sw=2 et:

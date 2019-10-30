@@ -1,0 +1,79 @@
+---
+- name: Ensure tang is installed
+  package:
+    name: "{{ __nbde_server_package_list }}"
+    state: present
+
+
+- name: Ensure tang is enabled and started
+  when: state is not defined or state != "stopped"
+  service:
+    name: "{{ __nbde_server_service }}"
+    enabled: yes
+    state: started
+
+
+- name: Ensure tang is enabled but stopped
+  when: state is defined and state == "stopped"
+  service:
+    name: "{{ __nbde_server_service }}"
+    enabled: yes
+    state: stopped
+
+
+- name: Ensure we create new keys
+  when: nbde_server_create_new_keys and not nbde_server_deploy_keys
+  tang:
+    state: keys-created
+    force: yes
+    keygen: "{{ __nbde_server_keygen }}"
+    keydir: "{{ __nbde_server_keydir }}"
+
+
+- name: Ensure we create new keys for deploying
+  when: nbde_server_create_new_keys and nbde_server_deploy_keys
+  run_once: yes
+  tang:
+    state: keys-created
+    force: yes
+    keygen: "{{ __nbde_server_keygen }}"
+    keydir: "{{ __nbde_server_keydir }}"
+
+
+- name: Ensure we fetch the server keys
+  when: nbde_server_fetch_keys
+  synchronize:
+    mode: pull
+    src: "{{ __nbde_server_keydir }}/"
+    dest: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
+    delete: yes
+
+
+- name: Ensure we fetch the created keys for deploying
+  when: nbde_server_create_new_keys and nbde_server_deploy_keys
+  run_once: yes
+  synchronize:
+    mode: pull
+    src: "{{ __nbde_server_keydir }}/"
+    dest: "{{ nbde_server_keys_dir }}"
+    delete: yes
+
+
+- name: Ensure we copy specific keys to tang
+  when: nbde_server_deploy_keys
+  synchronize:
+    mode: push
+    src: "{{ nbde_server_keys_dir }}"
+    dest: "{{ __nbde_server_keys_to_deploy_dir }}"
+
+
+- name: Ensure we deploy the specific keys to tang
+  when: nbde_server_deploy_keys
+  tang:
+    state: keys-deployed
+    keydir: "{{ __nbde_server_keydir }}"
+    keys_to_deploy_dir: "{{ nbde_server_keys_dir }}"
+    base_keys_to_deploy_dir: "{{ __nbde_server_keys_to_deploy_dir }}"
+
+
+# vim:set ts=2 sw=2 et:

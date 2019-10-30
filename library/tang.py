@@ -8,6 +8,9 @@
 tang server. """
 
 import os
+import filecmp
+from shutil import copyfile
+from shutil import rmtree
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
@@ -41,7 +44,6 @@ class TangAnsibleError(Exception):
 
 def generate_tang_keys(module, keygen, keydir):
     """ Runs the keygen for generating a pair of usable tang keys. """
-
     args = [keygen, keydir]
 
     try:
@@ -75,7 +77,7 @@ def create_keys(module, keygen, keydir, force):
     return generate_tang_keys(module, keygen, keydir)
 
 
-def rotate_keys(keydir):
+def rotate_keys(keydir, newkeys):
     """ In here we rotate the existing keys. """
 
     total_rotated = 0
@@ -83,6 +85,10 @@ def rotate_keys(keydir):
         for listing in os.listdir(keydir):
             if listing.startswith("."):
                 continue
+
+            if newkeys and listing in newkeys:
+                continue
+
             old_file = os.path.join(keydir, listing)
             new_file = os.path.join(keydir, "." + listing)
             os.rename(old_file, new_file)
@@ -93,7 +99,48 @@ def rotate_keys(keydir):
 
     result = {"changed": False}
     if total_rotated > 0:
-        result.update({"changed": True})
+        result["changed"] = True
+
+    return result
+
+
+def deploy_keys(keydir, base_keysdir, keys_to_deploy_dir):
+    """ Depoy a specific set of keys from keys_to_deploy_dir to keydir. """
+
+    result = {"changed": False}
+
+    try:
+        new_dir = os.path.join(base_keysdir, keys_to_deploy_dir)
+        total_deployed = 0
+        newkeys = {}
+
+        for listing in os.listdir(new_dir):
+            if not listing.endswith(".jwk"):
+                continue
+
+            newkeys[listing] = listing
+            src = os.path.join(new_dir, listing)
+            dst = os.path.join(keydir, listing)
+
+            if os.path.exists(dst):
+                if filecmp.cmp(src, dst):
+                    continue
+                else:
+                    new_file = ".rotated-" + dst
+                    os.rename(dst, new_file)
+
+            copyfile(src, dst)
+            total_deployed += 1
+
+        rotate_keys(keydir, newkeys)
+        rmtree(base_keysdir)
+
+    except Exception as exc:
+        result = dict(msg="Keys deployment failed: {}".format(to_native(exc)))
+        raise TangAnsibleError(result)
+
+    if total_deployed > 0:
+        result["changed"] = True
 
     return result
 
@@ -104,9 +151,11 @@ def run_module():
     module_args = dict(
         name=dict(type="str", required=False),
         keygen=dict(type="str", required=False),
-        keydir=dict(type="str", required=True),
+        keydir=dict(type="str", required=False),
         force=dict(type="bool", required=False, default=False),
         state=dict(type="str", required=False),
+        keys_to_deploy_dir=dict(type="str", required=False),
+        base_keys_to_deploy_dir=dict(type="str", required=False),
     )
 
     result = dict(changed=False, original_message="", message="")
@@ -121,11 +170,13 @@ def run_module():
     keygen = params["keygen"]
     keydir = params["keydir"]
     force = params["force"]
+    keys_to_deploy_dir = params["keys_to_deploy_dir"]
+    base_keysdir = params["base_keys_to_deploy_dir"]
 
-    if state == "keys-rotated":
-        result = rotate_keys(keydir)
-    elif state == "keys-created":
+    if state == "keys-created":
         result = create_keys(module, keygen, keydir, force)
+    elif state == "keys-deployed":
+        result = deploy_keys(keydir, base_keysdir, keys_to_deploy_dir)
 
     module.exit_json(**result)
 

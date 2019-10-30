@@ -1,9 +1,11 @@
+# SPDX-License-Identifier: MIT
 ---
-# defaults file for linux-system-roles.tang
+# defaults file for nbde_server
 
-tang_keygen: "/usr/libexec/tangd-keygen"
-tang_keydir: "/var/db/tang"
-rotate_keys: no
-state: started
+nbde_server_provider: "tang"
+nbde_server_deploy_keys: no
+nbde_server_fetch_keys: no
+nbde_server_create_new_keys: no
+nbde_server_keys_dir: "keys"
 
 # vim:set ts=2 sw=2 et:

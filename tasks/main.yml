@@ -1,49 +1,15 @@
 ---
-# tasks file for linux-system-roles.tang
+# tasks file for nbde_server.
 
-- name: Ensure tang is installed
-  package:
-    name: tang
-    state: present
+- name: Set version-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
 
+- name: Include the appropriate provider tasks
+  include_tasks: "main-{{ nbde_server_provider }}.yml"
 
-- name: Ensure tang is enabled and started
-  when: state != "stopped"
-  systemd:
-    name: tangd.socket
-    enabled: yes
-    masked: no
-    state: started
-
-
-- name: Ensure tang is enabled and stopped
-  when: state == "stopped"
-  systemd:
-    name: tangd.socket
-    enabled: yes
-    masked: no
-    state: stopped
-
-
-- name: Ensure we have keys
-  tang:
-    state: keys-created
-    keygen: "{{ tang_keygen }}"
-    keydir: "{{ tang_keydir }}"
-
-
-- name: Ensure we create new keys
-  when: create_new_keys
-  tang:
-    state: keys-created
-    force: yes
-    keygen: "{{ tang_keygen }}"
-    keydir: "{{ tang_keydir }}"
-
-
-- name: Ensure keys are rotated
-  when: rotate_keys
-  tang:
-    state: keys-rotated
-    keydir: "{{ tang_keydir }}"
 # vim:set ts=2 sw=2 et:
