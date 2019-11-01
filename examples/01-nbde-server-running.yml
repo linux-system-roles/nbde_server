@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Ensure NBDE server is deployed and enabled
+  hosts: nbde_servers_test
+  become: true
+
+  roles:
+    - role: nbde_server
+
+# vim:set ts=2 sw=2 et:
+

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Ensure NBDE server is deployed and creates new keys
+  hosts: nbde_servers_test
+  become: true
+
+  roles:
+    - role: nbde_server
+      nbde_server_create_new_keys: yes
+
+# vim:set ts=2 sw=2 et:
+

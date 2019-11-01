@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Ensure NBDE server is deployed but stopped
+  hosts: nbde_servers_test
+  become: true
+
+  roles:
+    - role: nbde_server
+      state: stopped
+
+# vim:set ts=2 sw=2 et:
+
