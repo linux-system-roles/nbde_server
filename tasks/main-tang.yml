@@ -61,6 +61,7 @@
 
 - name: Ensure we copy specific keys to tang
   when: nbde_server_deploy_keys
+  check_mode: no
   synchronize:
     mode: push
     src: "{{ nbde_server_keys_dir }}"
