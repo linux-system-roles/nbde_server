@@ -6,7 +6,7 @@ galaxy_info:
   galaxy_tags:
     - system
     - nbde
-    - nbde_server
+    - server
     - tang
     - redhat
     - rhel
