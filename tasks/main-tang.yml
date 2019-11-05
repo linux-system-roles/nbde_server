@@ -21,21 +21,19 @@
     state: stopped
 
 
-- name: Ensure we create new keys
+- name: Ensure we have keys
   when: nbde_server_create_new_keys and not nbde_server_deploy_keys
   tang:
     state: keys-created
-    force: yes
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
 
 
-- name: Ensure we create new keys for deploying
+- name: Ensure we have keys for deploying
   when: nbde_server_create_new_keys and nbde_server_deploy_keys
   run_once: yes
   tang:
     state: keys-created
-    force: yes
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
 
