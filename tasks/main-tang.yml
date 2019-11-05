@@ -45,6 +45,8 @@
     src: "{{ __nbde_server_keydir }}/"
     dest: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
     delete: yes
+    rsync_opts:
+      - "--chmod=D2755,F644"
 
 
 - name: Ensure we fetch the created keys for deploying
@@ -55,6 +57,8 @@
     src: "{{ __nbde_server_keydir }}/"
     dest: "{{ nbde_server_keys_dir }}"
     delete: yes
+    rsync_opts:
+      - "--chmod=D2755,F644"
 
 
 - name: Ensure we copy specific keys to tang
