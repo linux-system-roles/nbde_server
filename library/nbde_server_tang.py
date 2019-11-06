@@ -23,7 +23,7 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = """
 ---
-module: tang
+module: nbde_server_tang
 
 short_description: Module for performing operations in a tang server
 

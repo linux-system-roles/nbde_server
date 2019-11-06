@@ -23,7 +23,7 @@
 
 - name: Ensure we have keys
   when: nbde_server_create_new_keys and not nbde_server_deploy_keys
-  tang:
+  nbde_server_tang:
     state: keys-created
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
@@ -32,7 +32,7 @@
 - name: Ensure we have keys for deploying
   when: nbde_server_create_new_keys and nbde_server_deploy_keys
   run_once: yes
-  tang:
+  nbde_server_tang:
     state: keys-created
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
@@ -72,7 +72,7 @@
 
 - name: Ensure we deploy the specific keys to tang
   when: nbde_server_deploy_keys
-  tang:
+  nbde_server_tang:
     state: keys-deployed
     keydir: "{{ __nbde_server_keydir }}"
     keys_to_deploy_dir: "{{ nbde_server_keys_dir }}"
