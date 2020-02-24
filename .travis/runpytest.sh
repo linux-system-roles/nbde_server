@@ -1,8 +1,15 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 
-# Wrapper around pytest. First argument is a path to environment python, the
-# rest of arguments are passed to pytest.
+# A shell wrapper around pytest. As pytest is sensitive on a content of project
+# directory: if a project contains no unit tests, pytest fails. Similarly if
+# there is nothing to be analyzed with coverage, running pytest with --cov*
+# arguments may lead to problems. For this reasons, this shell wrapper skips
+# running pytest if there are no unit tests and filters out --cov*/--no-cov*
+# arguments if there is nothing to be analyzed with coverage.
+
+# First argument to the script is a path to environment python, the rest of
+# arguments are passed to pytest.
 
 set -e
 
@@ -10,7 +17,6 @@ ME=$(basename $0)
 SCRIPTDIR=$(readlink -f $(dirname $0))
 TOPDIR=$(readlink -f ${SCRIPTDIR}/..)
 
-# Include library.
 . ${SCRIPTDIR}/utils.sh
 
 if [[ ! -d ${TOPDIR}/tests/unit ]]; then

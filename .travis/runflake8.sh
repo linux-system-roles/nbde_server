@@ -1,8 +1,11 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 
-# Run flake8. The first script argument is a path to Python interpreter, the
-# rest of arguments are passed to flake8.
+# A shell wrapper around flake8. The purpose of this wrapper is to get to user
+# an opportunity to disable running flake8 via config.sh.
+
+# The first script argument is a path to Python interpreter, the rest of
+# arguments are passed to flake8.
 
 # Environment variables:
 #
@@ -14,7 +17,6 @@ set -e
 ME=$(basename $0)
 SCRIPTDIR=$(readlink -f $(dirname $0))
 
-# Include library and config.
 . ${SCRIPTDIR}/utils.sh
 . ${SCRIPTDIR}/config.sh
 

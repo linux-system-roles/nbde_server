@@ -16,19 +16,15 @@ ME=$(basename $0)
 SCRIPTDIR=$(readlink -f $(dirname $0))
 TOPDIR=$(readlink -f ${SCRIPTDIR}/..)
 
-# Include library and config.
 . ${SCRIPTDIR}/utils.sh
 . ${SCRIPTDIR}/config.sh
-
-# Run user defined hook from .travis/config.sh.
-lsr_runsyspycmd_hook "$@"
 
 # Sanitize arguments (see https://github.com/tox-dev/tox/issues/1463):
 ENVPYTHON=$(readlink -f $1)
 SYSPYTHON=$(readlink -f $2)
 shift 2
 
-if lsr_compare_pythons ${ENVPYTHON} -ne ${SYSPYTHON}; then
+if ! lsr_venv_python_matches_system_python ${ENVPYTHON} ${SYSPYTHON}; then
   lsr_info "${ME}: ${1:-<missing command>}:" \
     "Environment Python has no access to system Python libraries. Skipping."
   exit 0
