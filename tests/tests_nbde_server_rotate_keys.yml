@@ -1,0 +1,67 @@
+---
+# Expected behavior of nbde_server_rotate_keys is the following:
+# - if there are no keys, create new keys
+# - if there are keys, do not touch them, unless set
+# - if set, rotate existing keys, if any, plus create new keys
+- name: Verify behavior of nbde_server_rotate_keys
+  hosts: all
+
+  tasks:
+    - name: Ensure we have keys
+      import_role:
+        name: nbde_server
+
+    - name: Gather keys
+      find:
+        paths: "{{ __nbde_server_keydir }}"
+        file_type: file
+        recurse: no
+        patterns:
+          - '*.jwk'
+          - '.*.jwk'
+      check_mode: yes
+      register: existing_keys
+
+    - name: Run with nbde_server_rotate_keys not set to check keys
+      import_role:
+        name: nbde_server
+      vars:
+        nbde_server_rotate_keys: false
+
+    - name: Gather keys after running with nbde_server_rotate_keys not set
+      find:
+        paths: "{{ __nbde_server_keydir }}"
+        file_type: file
+        recurse: no
+        patterns:
+          - '*.jwk'
+          - '.*.jwk'
+      check_mode: yes
+      register: existing_keys_rotate_not_set
+
+    - name: Check whether keys changed - nbde_server_rotate_keys not set
+      assert:
+        that: "{{ existing_keys.files == existing_keys_rotate_not_set.files }}"
+
+    - name: Run with nbde_server_rotate_keys set to check keys
+      import_role:
+        name: nbde_server
+      vars:
+        nbde_server_rotate_keys: true
+
+    - name: Gather keys after running with nbde_server_rotate_keys set
+      find:
+        paths: "{{ __nbde_server_keydir }}"
+        file_type: file
+        recurse: no
+        patterns:
+          - '*.jwk'
+          - '.*.jwk'
+      check_mode: yes
+      register: existing_keys_rotate_set
+
+    - name: Check whether keys changed - nbde_server_rotate_keys set
+      assert:
+        that: "{{ existing_keys.files != existing_keys_rotate_set.files }}"
+
+# vim:set ts=2 sw=2 et:

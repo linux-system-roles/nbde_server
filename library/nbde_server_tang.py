@@ -191,6 +191,10 @@ def run_module():
 
     if state == "keys-created":
         result = create_keys(module, keygen, keydir, force)
+    elif state == "keys-rotated":
+        # We will rotate existing keys and then create new keys.
+        rotate_keys(module, keydir, None)
+        result = create_keys(module, keygen, keydir, force)
     elif state == "keys-deployed":
         result = deploy_keys(module, keydir, base_keysdir, keys_to_deploy_dir)
 

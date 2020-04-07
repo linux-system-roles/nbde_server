@@ -5,4 +5,7 @@
   roles:
     - nbde_server
 
+  tasks:
+    - include_tasks: verify-role-results.yml
+
 # vim:set ts=2 sw=2 et:

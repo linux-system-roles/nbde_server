@@ -13,9 +13,9 @@ Role Variables
 The `nbde_server_provider` variable identifies the provider for `nbde_server` role. We currently support `tang` as an `nbde_server` provider, meaning
 that the `nbde_server` role is currently able to provision/deploy a tang server. Default is `tang`.
 
-### `nbde_server_create_new_keys`
-The `nbde_server_create_new_keys` variable indicates whether we should create new keys to be used when deploying the NBDE server. If set to `yes`, keys
-will be created in case there are no keys. Default is `no`.
+### `nbde_server_rotate_keys`
+The `nbde_server_rotate_keys` variable indicates whether we should rotate existing keys -- if any --, then create new keys. If set to
+`yes`, existing keys will be rotate and new keys will be created. Default is `no`.
 
 ### `nbde_server_deploy_keys`
 The `nbde_server_deploy_new_keys` variable indicates whether we should deploy the specific keys located in `nbde_server_keys_dir` directory. Default is `no`.
