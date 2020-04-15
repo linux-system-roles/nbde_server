@@ -1,8 +1,11 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 
-# Run black (the Python formatter). The first script argument is a path to
-# Python interpreter, the rest of arguments are passed to black.
+# A shell wrapper around black (Python formatter). The purpose of this wrapper
+# is to get a user the opportunity to control black from config.sh via setting
+# environment variables.
+
+# The given command line arguments are passed to black.
 
 # Environment variables:
 #
@@ -16,13 +19,15 @@
 #
 #   RUN_BLACK_DISABLED
 #     if set to an arbitrary non-empty value, black will be not executed
+#
+#   RUN_BLACK_EXTRA_ARGS
+#     extra cmd line args to pass to black
 
 set -e
 
 ME=$(basename $0)
 SCRIPTDIR=$(readlink -f $(dirname $0))
 
-# Include library and config.
 . ${SCRIPTDIR}/utils.sh
 . ${SCRIPTDIR}/config.sh
 
@@ -30,11 +35,6 @@ if [[ "${RUN_BLACK_DISABLED}" ]]; then
   lsr_info "${ME}: black is disabled. Skipping."
   exit 0
 fi
-
-# Sanitize path in case if running within tox (see
-# https://github.com/tox-dev/tox/issues/1463):
-ENVPYTHON=$(readlink -f $1)
-shift
 
 DEFAULT_INCLUDE='^[^.].*\.py$'
 DEFAULT_EXCLUDE='/(\.[^.].*|tests/roles)/'
@@ -61,7 +61,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 set -x
-${ENVPYTHON} -m black \
+python -m black \
   --include "${INCLUDE_ARG:-${RUN_BLACK_INCLUDE:-${DEFAULT_INCLUDE}}}" \
   --exclude "${EXCLUDE_ARG:-${RUN_BLACK_EXCLUDE:-${DEFAULT_EXCLUDE}}}" \
+  ${RUN_BLACK_EXTRA_ARGS:-} \
   "${OTHER_ARGS[@]}"

@@ -15,45 +15,35 @@
 #   * .travis/runcoveralls.sh:
 #
 #       - LSR_PUBLISH_COVERAGE
+#       - LSR_TESTSDIR
+#       - function lsr_runcoveralls_hook
 #
 # Environment variables that not start with LSR_* but have influence on CI
 # process:
 #
-#   * run_pylint.py:
+#   * .travis/runpylint.sh:
 #
 #       - RUN_PYLINT_INCLUDE
 #       - RUN_PYLINT_EXCLUDE
 #       - RUN_PYLINT_DISABLED
+#       - RUN_PYLINT_SETUP_MODULE_UTILS
 #
 #   * .travis/runblack.sh:
 #
 #       - RUN_BLACK_INCLUDE
 #       - RUN_BLACK_EXCLUDE
 #       - RUN_BLACK_DISABLED
+#       - RUN_BLACK_EXTRA_ARGS
 #
 #   * .travis/runflake8.sh:
 #
 #       - RUN_FLAKE8_DISABLED
+#       - RUN_FLAKE8_EXTRA_ARGS
 #
-
-##
-# lsr_runcoveralls_hook ARGS
+#   * .travis/runsyspycmd.sh:
 #
-#   ARGS - see .travis/runcoveralls.sh
+#       - function lsr_runsyspycmd_hook
 #
-# Called from .travis/runcoveralls.sh.
-function lsr_runcoveralls_hook() {
-  # Add custom commands here.
-  return 0
-}
-
-##
-# lsr_runsyspycmd_hook ARGS
+#   * .travis/runpytest.sh:
 #
-#   ARGS - see .travis/runsyspycmd.sh
-#
-# Called from .travis/runsyspycmd.sh.
-function lsr_runsyspycmd_hook() {
-  # Add custom commands here.
-  return 0
-}
+#       - RUN_PYTEST_SETUP_MODULE_UTILS
