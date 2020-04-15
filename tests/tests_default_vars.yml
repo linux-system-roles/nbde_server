@@ -4,17 +4,17 @@
 
   tasks:
     - block:
-      - import_role:
-        name: nbde_server
-        when: false
+        - import_role:
+            name: nbde_server
+          when: false
 
-      - assert:
-        that: "vars[item] is defined"
-        loop:
-          - nbde_server_provider
-          - nbde_server_deploy_keys
-          - nbde_server_fetch_keys
-          - nbde_server_create_new_keys
-          - nbde_server_keys_dir
-        when: "ansible_version.full is version_compare('2.7', '>=')"
+        - assert:
+            that: "vars[item] is defined"
+          loop:
+            - nbde_server_provider
+            - nbde_server_deploy_keys
+            - nbde_server_fetch_keys
+            - nbde_server_create_new_keys
+            - nbde_server_keys_dir
+          when: "ansible_version.full is version_compare('2.7', '>=')"
 # vim:set ts=2 sw=2 et:
