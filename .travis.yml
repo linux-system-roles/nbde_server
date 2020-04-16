@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: MIT
 ---
+dist: xenial
 language: python
 env:
   global:
-    - LSR_ANSIBLES='ansible==2.6.* ansible==2.7.* ansible==2.8.*'
+    - LSR_ANSIBLES='ansible==2.7.* ansible==2.8.* ansible==2.9.*'
     - LSR_MSCENARIOS='default'
 matrix:
   include:
@@ -13,7 +14,7 @@ matrix:
     - python: 3.5
     - python: 3.6
     - python: 3.7
-    - python: 3.7-dev
+    - python: 3.8
     - python: 3.8-dev
 
 services:

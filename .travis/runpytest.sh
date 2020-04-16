@@ -1,27 +1,38 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 
-# Wrapper around pytest. First argument is a path to environment python, the
-# rest of arguments are passed to pytest.
+# A shell wrapper around pytest. As pytest is sensitive on a content of project
+# directory: if a project contains no unit tests, pytest fails. Similarly if
+# there is nothing to be analyzed with coverage, running pytest with --cov*
+# arguments may lead to problems. For this reasons, this shell wrapper skips
+# running pytest if there are no unit tests and filters out --cov*/--no-cov*
+# arguments if there is nothing to be analyzed with coverage.
+
+# The given command line arguments are passed to pytest.
+
+# Environment variables:
+#
+#   RUN_PYTEST_SETUP_MODULE_UTILS
+#     if set to an arbitrary non-empty value, the environment will be
+#     configured so that tests of the module_utils/ code will be run
+#     correctly
 
 set -e
 
 ME=$(basename $0)
 SCRIPTDIR=$(readlink -f $(dirname $0))
-TOPDIR=$(readlink -f ${SCRIPTDIR}/..)
 
-# Include library.
 . ${SCRIPTDIR}/utils.sh
+. ${SCRIPTDIR}/config.sh
 
 if [[ ! -d ${TOPDIR}/tests/unit ]]; then
   lsr_info "${ME}: No unit tests found. Skipping."
   exit 0
 fi
 
-# Sanitize path in case if running within tox (see
-# https://github.com/tox-dev/tox/issues/1463):
-ENVPYTHON=$(readlink -f $1)
-shift
+if [[ "${RUN_PYTEST_SETUP_MODULE_UTILS}" ]]; then
+  lsr_setup_module_utils
+fi
 
 PYTEST_OPTS=()
 PYTEST_OPTS_NOCOV=()
@@ -52,4 +63,4 @@ if [[ "${USE_COV}" == "no" ]]; then
 fi
 
 set -x
-${ENVPYTHON} -m pytest "${PYTEST_OPTS[@]}"
+python -m pytest "${PYTEST_OPTS[@]}"
