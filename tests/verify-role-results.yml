@@ -1,0 +1,44 @@
+---
+- name: Gather state of required packages
+  package:
+    name: "{{ __nbde_server_package_list }}"
+    state: present
+  check_mode: true
+  register: packages_installed
+
+- name: Check whether required packages are installed
+  assert:
+    that: not packages_installed.changed
+
+- name: Gather state of service when it should be enabled and started
+  when: state is not defined or state != "stopped"
+  service:
+    name: "{{ __nbde_server_service }}"
+    enabled: true
+    state: started
+  check_mode: true
+  register: nbde_service_started
+
+- name: Check whether service is enabled and started when it should be
+  when: state is not defined or state != "stopped"
+  assert:
+    that: not nbde_service_started.changed
+
+- name: Gather state of service when it should be enabled and stopped
+  when: state is defined or state == "stopped"
+  service:
+    name: "{{ __nbde_server_service }}"
+    enabled: true
+    state: stopped
+  check_mode: true
+  register: nbde_service_stopped
+
+- name: Check whether service is enabled and stopped when it should be
+  when: state is defined or state == "stopped"
+  assert:
+    that: not nbde_service_stopped.changed
+
+- name: Include the appropriate provider verification tasks
+  include_tasks: "verify-{{ nbde_server_provider }}-results.yml"
+
+# vim:set ts=2 sw=2 et:

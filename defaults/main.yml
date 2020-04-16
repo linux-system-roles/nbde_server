@@ -5,7 +5,7 @@
 nbde_server_provider: "tang"
 nbde_server_deploy_keys: no
 nbde_server_fetch_keys: no
-nbde_server_create_new_keys: no
+nbde_server_rotate_keys: no
 nbde_server_keys_dir: "keys"
 
 # vim:set ts=2 sw=2 et:
