@@ -8,7 +8,7 @@
 
 - name: Check whether required packages are installed
   assert:
-    that: "{{ not packages_installed.changed }}"
+    that: not packages_installed.changed
 
 - name: Gather state of service when it should be enabled and started
   when: state is not defined or state != "stopped"
@@ -22,7 +22,7 @@
 - name: Check whether service is enabled and started when it should be
   when: state is not defined or state != "stopped"
   assert:
-    that: "{{ not nbde_service_started.changed }}"
+    that: not nbde_service_started.changed
 
 - name: Gather state of service when it should be enabled and stopped
   when: state is defined or state == "stopped"
@@ -36,7 +36,7 @@
 - name: Check whether service is enabled and stopped when it should be
   when: state is defined or state == "stopped"
   assert:
-    that: "{{ not nbde_service_stopped.changed }}"
+    that: not nbde_service_stopped.changed
 
 - name: Include the appropriate provider verification tasks
   include_tasks: "verify-{{ nbde_server_provider }}-results.yml"

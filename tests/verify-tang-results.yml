@@ -9,6 +9,6 @@
 
 - name: Check whether there are keys
   assert:
-    that: "{{ not existing_keys.changed }}"
+    that: not existing_keys.changed
 
 # vim:set ts=2 sw=2 et:
