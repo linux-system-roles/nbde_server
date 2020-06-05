@@ -46,12 +46,11 @@ def generate_tang_keys(module, keygen, keydir):
     """ Runs the keygen for generating a pair of usable tang keys. """
     args = [keygen, keydir]
 
-    try:
-        ret_code, out, err = module.run_command(args)
-    except Exception as exc:
+    ret, out, err = module.run_command(args)
+    if ret != 0:
         result = dict(
-            msg="tangd-keygen failed: {}".format(to_native(exc)),
-            ret_code=ret_code,
+            msg="tangd-keygen failed: {}".format(err),
+            ret_code=ret,
             stdout=out,
             stderr=err,
         )
