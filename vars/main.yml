@@ -2,6 +2,6 @@
 ---
 
 # Put internal variables here that are not distribution-specific.
-__nbde_server_keys_to_deploy_dir: '/tmp/nbde-keys'
+__nbde_server_remote_tmpdir: /tmp/.nbde_server_tmp
 
 # vim:set ts=2 sw=2 et:

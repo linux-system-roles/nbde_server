@@ -1,7 +1,7 @@
 ---
 - name: Ensure tang is installed
   package:
-    name: "{{ __nbde_server_package_list }}"
+    name: "{{ __nbde_server_packages }}"
     state: present
 
 

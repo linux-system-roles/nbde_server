@@ -3,9 +3,13 @@
 
 # Put internal variables here with CentOS 7-specific values.
 
-__nbde_server_package_list: ['tang', 'rsync']
-__nbde_server_service: 'tangd.socket'
-__nbde_server_keygen: '/usr/libexec/tangd-keygen'
-__nbde_server_keydir: '/var/db/tang'
+__nbde_server_packages:
+  - tang
+  - rsync
+
+__nbde_server_service: tangd.socket
+
+__nbde_server_keygen: /usr/libexec/tangd-keygen
+__nbde_server_keydir: /var/db/tang
 
 # vim:set ts=2 sw=2 et:
