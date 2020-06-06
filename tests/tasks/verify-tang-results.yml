@@ -5,10 +5,10 @@
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
   check_mode: true
-  register: existing_keys
+  register: nbde_server_existing_keys
 
 - name: Check whether there are keys
   assert:
-    that: not existing_keys.changed
+    that: not nbde_server_existing_keys.changed
 
 # vim:set ts=2 sw=2 et:

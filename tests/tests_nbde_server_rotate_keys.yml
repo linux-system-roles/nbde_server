@@ -20,7 +20,7 @@
           - '*.jwk'
           - '.*.jwk'
       check_mode: yes
-      register: existing_keys
+      register: nbde_server_keys
 
     - name: Run with nbde_server_rotate_keys not set to check keys
       import_role:
@@ -37,11 +37,11 @@
           - '*.jwk'
           - '.*.jwk'
       check_mode: yes
-      register: existing_keys_rotate_not_set
+      register: nbde_server_rotate_not_set
 
     - name: Check whether keys changed - nbde_server_rotate_keys not set
       assert:
-        that: existing_keys.files == existing_keys_rotate_not_set.files
+        that: nbde_server_keys.files == nbde_server_rotate_not_set.files
 
     - name: Run with nbde_server_rotate_keys set to check keys
       import_role:
@@ -58,10 +58,10 @@
           - '*.jwk'
           - '.*.jwk'
       check_mode: yes
-      register: existing_keys_rotate_set
+      register: nbde_server_rotate_set
 
     - name: Check whether keys changed - nbde_server_rotate_keys set
       assert:
-        that: existing_keys.files != existing_keys_rotate_set.files
+        that: nbde_server_keys.files != nbde_server_rotate_set.files
 
 # vim:set ts=2 sw=2 et:
