@@ -11,7 +11,7 @@
     state: keys-rotated
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
-    cachedir: "{{ __nbde_server_cachedir }}"
+  notify: nbde_server tang cache update
 
 
 - name: Ensure we have keys
@@ -20,11 +20,13 @@
     state: keys-created
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
-    cachedir: "{{ __nbde_server_cachedir }}"
+  notify: nbde_server tang cache update
+
 
 - name: Perform key management (fetch/deploy) tasks
   when: nbde_server_fetch_keys or nbde_server_deploy_keys
   include: tang-key-management.yml
+  notify: nbde_server tang cache update
 
 
 - name: Ensure tang is enabled and started
@@ -33,6 +35,7 @@
     name: "{{ __nbde_server_service }}"
     enabled: yes
     state: started
+  notify: nbde_server tang cache update
 
 
 - name: Ensure tang is enabled but stopped
@@ -41,5 +44,8 @@
     name: "{{ __nbde_server_service }}"
     enabled: yes
     state: stopped
+
+- name: Run notified handlers for nbde_server
+  meta: flush_handlers
 
 ## vim:set ts=2 sw=2 et:

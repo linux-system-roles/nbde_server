@@ -117,7 +117,6 @@
         state: keys-deployed
         keydir: "{{ __nbde_server_keydir }}"
         keygen: "{{ __nbde_server_keygen }}"
-        cachedir: "{{ __nbde_server_cachedir }}"
         keys_to_deploy_dir: "{{ __nbde_server_remote_workdir }}"
 
 

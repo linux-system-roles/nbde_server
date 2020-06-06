@@ -160,6 +160,19 @@ def deploy_keys(module, keydir, keys_to_deploy_dir):
     return result
 
 
+def update_cache(module, keydir, cachedir, update):
+    """ Update tang cache. """
+
+    if not os.path.isfile(update):
+        return {"changed": False}
+
+    args = [update, keydir, cachedir]
+    ret, _, _ = module.run_command(args)
+    if ret != 0:
+        return {"changed": False}
+    return {"changed": True}
+
+
 def run_module():
     """ The entry point of the module. """
 
@@ -168,6 +181,7 @@ def run_module():
         keygen=dict(type="str", required=False),
         keydir=dict(type="str", required=False),
         cachedir=dict(type="str", required=False),
+        update=dict(type="str", required=False),
         force=dict(type="bool", required=False, default=False),
         state=dict(type="str", required=False),
         keys_to_deploy_dir=dict(type="str", required=False),
@@ -182,6 +196,7 @@ def run_module():
     keygen = params["keygen"]
     keydir = params["keydir"]
     cachedir = params["cachedir"]
+    update = params["update"]
     force = params["force"]
     keys_to_deploy_dir = params["keys_to_deploy_dir"]
 
@@ -193,6 +208,8 @@ def run_module():
         result = create_keys(module, keygen, keydir, force)
     elif state == "keys-deployed":
         result = deploy_keys(module, keydir, keys_to_deploy_dir)
+    elif state == "cache-updated":
+        result = update_cache(module, keydir, cachedir, update)
 
     module.exit_json(**result)
 
