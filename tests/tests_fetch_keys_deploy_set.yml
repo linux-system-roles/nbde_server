@@ -48,8 +48,10 @@
         nbde_server_deploy_keys: yes
 
     - name: Check whether the common keys were properly fetched
-      local_action: stat path="{{ nbde_server_keys_dir }}/{{ item.path | basename }}"  # yamllint disable-line rule:line-length
+      stat:
+        path: "{{ nbde_server_keys_dir }}/{{ item.path | basename }}"
       loop: "{{ nbde_server_host_common_keys.files }}"
+      delegate_to: localhost
       register: nbde_server_local_common_keys
 
     - name: Verify the common keys are correct
@@ -58,12 +60,18 @@
       loop: "{{ nbde_server_local_common_keys.results }}"
 
     - name: Gather local host keys to verify deploy
-      local_action: find paths="{{ nbde_server_keys_dir }}/{{ inventory_hostname }}" hidden="yes"  # yamllint disable-line rule:line-length
+      find:
+        paths: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
+        hidden: yes
+        patterns:
+          - '*.jwk'
+          - '.*.jwk'
+      delegate_to: localhost
       register: nbde_server_local_host_keys
 
     - name: Check whether the host keys were properly deployed
       stat:
-        path="{{ __nbde_server_keydir }}/{{ item.path | basename }}"
+        path: "{{ __nbde_server_keydir }}/{{ item.path | basename }}"
       loop: "{{ nbde_server_local_host_keys.files }}"
       register: nbde_server_deployed_keys
 
@@ -73,7 +81,13 @@
       loop: "{{ nbde_server_deployed_keys.results }}"
 
     - name: Gather local common keys to verify deploy
-      local_action: find paths="{{ nbde_server_keys_dir }}" hidden="yes"
+      find:
+        paths: "{{ nbde_server_keys_dir }}"
+        hidden: yes
+        patterns:
+          - '*.jwk'
+          - '.*.jwk'
+      delegate_to: localhost
       register: nbde_server_local_common_keys
 
     - name: Check whether the local common keys were properly deployed
@@ -81,7 +95,6 @@
         path="{{ __nbde_server_keydir }}/{{ item.path | basename }}"
       loop: "{{ nbde_server_local_common_keys.files }}"
       register: nbde_server_deployed_common_keys
-
 
     - name: Verify the common keys were deployed
       assert:

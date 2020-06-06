@@ -77,7 +77,10 @@
     # This task gathers the common keys and fills up a nbde_server_common_keys
     # variable, to be used later when preparing for deployment.
     - name: Gather common keys to be deployed
-      local_action: find paths="{{ nbde_server_keys_dir }}" hidden="yes"
+      find:
+        paths: "{{ nbde_server_keys_dir }}"
+        hidden: yes
+      delegate_to: localhost
       register: nbde_server_common_keys
 
 
@@ -94,7 +97,10 @@
     # This task gathers the specific keys fills up a nbde_server_host_keys
     # variable, to be used later when preparing for deployment.
     - name: Gather host keys to be deployed
-      local_action: find paths="{{ nbde_server_keys_dir }}/{{ inventory_hostname }}" hidden="yes"  # yamllint disable-line rule:line-length
+      find:
+        paths: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
+        hidden: yes
+      delegate_to: localhost
       register: nbde_server_host_keys
 
 

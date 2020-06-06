@@ -42,8 +42,10 @@
         nbde_server_deploy_keys: no
 
     - name: Check whether the keys were properly fetched
-      local_action: stat path="{{ nbde_server_keys_dir }}/{{ inventory_hostname }}/{{ item.path | basename }}"  # yamllint disable-line rule:line-length
+      stat:
+        path: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}/{{ item.path | basename }}"  # yamllint disable-line rule:line-length
       loop: "{{ nbde_server_host_keys.files }}"
+      delegate_to: localhost
       register: nbde_server_local_keys
 
     - name: Verify the common keys are correct
