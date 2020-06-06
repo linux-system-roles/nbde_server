@@ -5,7 +5,6 @@
 
 __nbde_server_packages:
   - tang
-  - rsync
 
 __nbde_server_service: tangd.socket
 

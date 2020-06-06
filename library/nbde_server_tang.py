@@ -9,8 +9,6 @@ tang server. """
 
 import os
 import filecmp
-from shutil import copyfile
-from shutil import rmtree
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
@@ -111,44 +109,43 @@ def rotate_keys(module, keydir, newkeys):
     return result
 
 
-def deploy_keys(module, keydir, base_keysdir, keys_to_deploy_dir):
-    """ Depoy a specific set of keys from keys_to_deploy_dir to keydir. """
+def deploy_keys(module, keydir, keys_to_deploy_dir):
+    """ Deploy a specific set of keys from keys_to_deploy_dir to keydir. """
 
     result = {"changed": False}
     rotate_result = {"changed": False}
 
+    if not os.path.isdir(keys_to_deploy_dir):
+        return result
+
     try:
-        new_dir = os.path.join(base_keysdir, keys_to_deploy_dir)
         total_deployed = 0
         list_deployed = []
         locally_rotated = []
         newkeys = {}
 
-        for listing in os.listdir(new_dir):
+        for listing in os.listdir(keys_to_deploy_dir):
             if not listing.endswith(".jwk"):
                 continue
 
             newkeys[listing] = listing
-            src = os.path.join(new_dir, listing)
+            src = os.path.join(keys_to_deploy_dir, listing)
             dst = os.path.join(keydir, listing)
 
             if os.path.exists(dst):
                 if filecmp.cmp(src, dst):
                     continue
-                else:
-                    new_file = ".rotated-" + dst
-                    locally_rotated.append("{} -> {}".format(dst, new_file))
-                    if not module.check_mode:
-                        os.rename(dst, new_file)
+                new_file = ".rotated-" + dst
+                locally_rotated.append("{} -> {}".format(dst, new_file))
+                if not module.check_mode:
+                    module.atomic_move(dst, new_file)
 
             list_deployed.append(dst)
             if not module.check_mode:
-                copyfile(src, dst)
+                module.atomic_move(src, dst)
             total_deployed += 1
 
         rotate_result = rotate_keys(module, keydir, newkeys)
-        # This is just a temp directory.
-        rmtree(base_keysdir)
 
     except Exception as exc:
         result = dict(msg="Keys deployment failed: {}".format(to_native(exc)))
@@ -170,10 +167,10 @@ def run_module():
         name=dict(type="str", required=False),
         keygen=dict(type="str", required=False),
         keydir=dict(type="str", required=False),
+        cachedir=dict(type="str", required=False),
         force=dict(type="bool", required=False, default=False),
         state=dict(type="str", required=False),
         keys_to_deploy_dir=dict(type="str", required=False),
-        base_keys_to_deploy_dir=dict(type="str", required=False),
     )
 
     result = dict(changed=False, original_message="", message="")
@@ -184,9 +181,9 @@ def run_module():
     state = params["state"]
     keygen = params["keygen"]
     keydir = params["keydir"]
+    cachedir = params["cachedir"]
     force = params["force"]
     keys_to_deploy_dir = params["keys_to_deploy_dir"]
-    base_keysdir = params["base_keys_to_deploy_dir"]
 
     if state == "keys-created":
         result = create_keys(module, keygen, keydir, force)
@@ -195,7 +192,7 @@ def run_module():
         rotate_keys(module, keydir, None)
         result = create_keys(module, keygen, keydir, force)
     elif state == "keys-deployed":
-        result = deploy_keys(module, keydir, base_keysdir, keys_to_deploy_dir)
+        result = deploy_keys(module, keydir, keys_to_deploy_dir)
 
     module.exit_json(**result)
 

@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    nbde_server_fetch_keys: yes
+    nbde_server_keys_dir: /root/nbde_server/keys
+
+  roles:
+    - linux-system-roles.nbde_server
+# vim:set ts=2 sw=2 et:

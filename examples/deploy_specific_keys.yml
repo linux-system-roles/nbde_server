@@ -1,0 +1,16 @@
+---
+# This playbook will deploy a specific set of keys to every NBDE server.
+# Sharing keys is not recommended, but this is supported. To do this, place
+# the keys in the top level directory of nbde_server_keys_dir, then run this
+# playbook.
+- hosts: all
+  become: true
+
+  vars:
+    nbde_server_fetch_keys: yes
+    nbde_server_deploy_keys: yes
+    nbde_server_keys_dir: /root/nbde_server/keys
+
+  roles:
+    - linux-system-roles.nbde_server
+# vim:set ts=2 sw=2 et:
