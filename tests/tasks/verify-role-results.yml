@@ -39,6 +39,6 @@
     that: not nbde_service_stopped.changed
 
 - name: Include the appropriate provider verification tasks
-  include_tasks: "verify-{{ nbde_server_provider }}-results.yml"
+  include_tasks: verify-{{ nbde_server_provider }}-results.yml
 
 # vim:set ts=2 sw=2 et:
