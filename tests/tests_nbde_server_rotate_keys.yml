@@ -9,7 +9,7 @@
   tasks:
     - name: Ensure we have keys
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
 
     - name: Gather keys
       find:
@@ -24,7 +24,7 @@
 
     - name: Run with nbde_server_rotate_keys not set to check keys
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
       vars:
         nbde_server_rotate_keys: false
 
@@ -45,7 +45,7 @@
 
     - name: Run with nbde_server_rotate_keys set to check keys
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
       vars:
         nbde_server_rotate_keys: true
 

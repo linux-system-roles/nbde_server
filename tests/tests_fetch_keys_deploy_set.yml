@@ -22,7 +22,7 @@
   tasks:
     - name: Ensure we have keys
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
 
     - name: Gather common keys, from the first host in the inventory
       run_once: yes
@@ -41,7 +41,7 @@
 
     - name: Run with nbde_server_deploy_keys set to check the common keys
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
       vars:
         nbde_server_rotate_keys: no
         nbde_server_fetch_keys: yes

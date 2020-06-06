@@ -13,7 +13,7 @@
   tasks:
     - name: Ensure we have keys
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
 
     - name: Clean up nbde_server_keys_dir
       file:
@@ -22,7 +22,7 @@
 
     - name: Fetch the keys from every host
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
       vars:
         nbde_server_fetch_keys: yes
         nbde_server_deploy_keys: no
@@ -38,11 +38,10 @@
 
     - name: Redeploy these same keys
       import_role:
-        name: nbde_server
+        name: linux-system-roles.nbde_server
       vars:
         nbde_server_fetch_keys: no
         nbde_server_deploy_keys: yes
-
 
     - name: Gather keys after before redeploy
       find:

@@ -5,7 +5,7 @@
   tasks:
     - block:
         - import_role:
-            name: nbde_server
+            name: linux-system-roles.nbde_server
         - assert:
             that: "{{ item }} is defined"
           loop:
