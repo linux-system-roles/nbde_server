@@ -23,16 +23,91 @@ DOCUMENTATION = """
 ---
 module: nbde_server_tang
 
-short_description: Module for performing operations in a tang server
+short_description: Handle key management operations in a tang server.
 
 version_added: "2.5"
 
 description:
     - "This module performs operations such as key management -- i.e.
         creating/rotating keys -- on a tang server."
+options:
+    state:
+        description:
+            - indicates the state to achieve, which basically maps to
+              certain operations to be performed.
+        choices:
+            - keys-rotated:
+                - this performs a key rotation followed by the creation of new
+                  keys. Required parameters are keygen and keydir, that point
+                  to the tang key generation tool and the  tang key directory.
+            - keys-created:
+                - creates a new set of keys, if none exist. As keys-rotated,
+                  also take keygen and keydir as arguments, that point to the
+                  tang key generation tool and its key directory.
+            - keys-deployed:
+                - deploys keys that are present in keys_to_deploy_dir. This
+                  argument indicates a directory in the machine that runs the
+                  tang server where there are new keys to be deployed to the
+                  tang server. Additional arguments are keygen  and keydir,
+                  similar to keys-rotated and keys-created. Note that, since
+                  this directory is in the remote machine, you are expected
+                  to place the keys in there beforehand.
+            - cache-updated:
+                - updates the tang server cache. Besides keydir, the keys
+                  directory of the server, it requires the following
+                  parameters: update, which indicates the tool for performing
+                  the tang cache update (usually tangd-update), and cachedir,
+                  which indicates the cache directory.
+
+    If no state is specified, no action is performed.
 
 author:
-    - Sergio Correia
+    - Sergio Correia (scorreia@redhat.com)
+"""
+
+
+EXAMPLES = """
+---
+- name: Create new keys
+  nbde_server_tang:
+    state: keys-created:
+    keygen: /var/libexec/tangd-keygen
+    keydir: /var/db/tang
+
+- name: Rotate keys
+  nbde_server_tang:
+    state: keys-rotated
+    keygen: /var/libexec/tangd-keygen
+    keydir: /var/db/tang
+
+- name: Deploy keys from /root/keys
+    state: keys-rotated
+    keygen: /var/libexec/tangd-keygen
+    keydir: /var/db/tang
+    keys_to_deploy_dir: /root/keys
+
+- name: Update cache
+  nbde_server_tang:
+    state: cache-updated
+    update: /var/libexec/tangd-update
+    keydir: /var/db/tang
+    cachedir: /var/cache/tang
+"""
+
+
+RETURN = """
+state:
+    description: The state that was passed as argument.
+    type: str
+    returned: always
+arguments:
+    description: The arguments passed to the module.
+    type: dict
+    returned: always
+msg:
+    description: The output message the module may generate.
+    type: str
+    returned: always
 """
 
 
@@ -211,6 +286,8 @@ def run_module():
     elif state == "cache-updated":
         result = update_cache(module, keydir, cachedir, update)
 
+    result["state"] = state
+    result["arguments"] = params
     module.exit_json(**result)
 
 
