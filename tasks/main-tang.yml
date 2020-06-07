@@ -8,7 +8,7 @@
 - name: Ensure keys are rotated
   when: nbde_server_rotate_keys
   nbde_server_tang:
-    state: keys-rotated
+    action: rotate-keys
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
   notify: nbde_server tang cache update
@@ -17,7 +17,7 @@
 - name: Ensure we have keys
   when: not nbde_server_rotate_keys
   nbde_server_tang:
-    state: keys-created
+    action: create-keys
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
   notify: nbde_server tang cache update
