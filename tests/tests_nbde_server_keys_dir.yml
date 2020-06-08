@@ -14,20 +14,14 @@
           vars:
             nbde_server_fetch_keys: yes
 
-        - name: This task should not run
-          debug:
-            msg: Previous task should have failed
-          register: nbde_server_failed
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
       rescue:
-        - debug:
-            msg: Test succeeded. Role failed with nbde_server_keys_dir not set
-          register: nbde_server_success
-      always:
-        - fail:
-            msg: Task should have failed with nbde_server_keys_dir not set
-          when:
-            - nbde_server_success is not defined
-            - nbde_server_failed is defined
+        - name: Check for error with nbde_server_keys_dir not set
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
 
 
     - name: Test 2 - only nbde_server_deploy_keys set
@@ -38,20 +32,14 @@
           vars:
             nbde_server_deploy_keys: yes
 
-        - name: This task should not run
-          debug:
-            msg: Previous task should have failed
-          register: nbde_server_failed
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
       rescue:
-        - debug:
-            msg: Test succeeded. Role failed with nbde_server_keys_dir not set
-          register: nbde_server_success
-      always:
-        - fail:
-            msg: Task should have failed with nbde_server_keys_dir not set
-          when:
-            - nbde_server_success is not defined
-            - nbde_server_failed is defined
+        - name: Check for error with nbde_server_keys_dir not set
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
 
 
     - name: Test 3 - nbde_server_fetch_keys and nbde_server_deploy_keys set
@@ -63,20 +51,14 @@
             nbde_server_fetch_keys: yes
             nbde_server_deploy_keys: yes
 
-        - name: This task should not run
-          debug:
-            msg: Previous task should have failed
-          register: nbde_server_failed
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
       rescue:
-        - debug:
-            msg: Test succeeded. Role failed with nbde_server_keys_dir not set
-          register: nbde_server_success
-      always:
-        - fail:
-            msg: Task should have failed with nbde_server_keys_dir not set
-          when:
-            - nbde_server_success is not defined
-            - nbde_server_failed is defined
+        - name: Check for error with nbde_server_keys_dir not set
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
 
 
     - name: Test 4 - nbde_server_keys_dir is absolute path
@@ -88,22 +70,14 @@
             nbde_server_fetch_keys: yes
             nbde_server_keys_dir: ./foobar
 
-        - name: This task should not run
-          debug:
-            msg: Previous task should have failed
-          register: nbde_server_failed
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
       rescue:
-        - debug:
-            msg: >
-              Test succeeded. Role failed with nbde_server_keys_dir
-              not absolute path
-          register: nbde_server_success
-      always:
-        - fail:
-            msg: Task should have failed with nbde_server_keys_dir not set
-          when:
-            - nbde_server_success is not defined
-            - nbde_server_failed is defined
+        - name: Check for error with nbde_server_keys_dir not an absolute path
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
 
 
     - name: Test 5 - nbde_server_keys_dir is absolute path
@@ -115,21 +89,13 @@
             nbde_server_fetch_keys: yes
             nbde_server_keys_dir: foobar
 
-        - name: This task should not run
-          debug:
-            msg: Previous task should have failed
-          register: nbde_server_failed
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
       rescue:
-        - debug:
-            msg: >
-              Test succeeded. Role failed with nbde_server_keys_dir
-              not absolute path
-          register: nbde_server_success
-      always:
-        - fail:
-            msg: Task should have failed with nbde_server_keys_dir not set
-          when:
-            - nbde_server_success is not defined
-            - nbde_server_failed is defined
+        - name: Check for error with nbde_server_keys_dir not an absolute path
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
 
 # vim:set ts=2 sw=2 et:
