@@ -6,7 +6,7 @@
   hosts: all
 
   tasks:
-    - name: Test 1 - nbde_server_keys_dir is properly set
+    - name: Test 1 - only nbde_server_fetch_keys set
       block:
         - name: With nbde_server_fetch_keys
           import_role:
@@ -14,14 +14,23 @@
           vars:
             nbde_server_fetch_keys: yes
 
-        - name: Should have failed before
-          fail:
-            msg: "Should not run this; previous task should have failed"
+        - name: This task should not run
+          debug:
+            msg: Previous task should have failed
+          register: nbde_server_failed
       rescue:
         - debug:
-            msg: "Test succeeded"
+            msg: Test succeeded. Role failed with nbde_server_keys_dir not set
+          register: nbde_server_success
+      always:
+        - fail:
+            msg: Task should have failed with nbde_server_keys_dir not set
+          when:
+            - nbde_server_success is not defined
+            - nbde_server_failed is defined
 
-    - name: Test 2 - nbde_server_keys_dir is properly set
+
+    - name: Test 2 - only nbde_server_deploy_keys set
       block:
         - name: With nbde_server_deploy_keys
           import_role:
@@ -29,15 +38,23 @@
           vars:
             nbde_server_deploy_keys: yes
 
-        - name: Should have failed before
-          fail:
-            msg: "Should not run this; previous task should have failed"
+        - name: This task should not run
+          debug:
+            msg: Previous task should have failed
+          register: nbde_server_failed
       rescue:
         - debug:
-            msg: "Test succeeded"
+            msg: Test succeeded. Role failed with nbde_server_keys_dir not set
+          register: nbde_server_success
+      always:
+        - fail:
+            msg: Task should have failed with nbde_server_keys_dir not set
+          when:
+            - nbde_server_success is not defined
+            - nbde_server_failed is defined
 
 
-    - name: Test 3 - nbde_server_keys_dir is properly set
+    - name: Test 3 - nbde_server_fetch_keys and nbde_server_deploy_keys set
       block:
         - name: With nbde_server_fetch_keys and deploy keys
           import_role:
@@ -45,12 +62,21 @@
           vars:
             nbde_server_fetch_keys: yes
             nbde_server_deploy_keys: yes
-        - name: Should have failed before
-          fail:
-            msg: "Should not run this; previous task should have failed"
+
+        - name: This task should not run
+          debug:
+            msg: Previous task should have failed
+          register: nbde_server_failed
       rescue:
         - debug:
-            msg: "Test succeeded"
+            msg: Test succeeded. Role failed with nbde_server_keys_dir not set
+          register: nbde_server_success
+      always:
+        - fail:
+            msg: Task should have failed with nbde_server_keys_dir not set
+          when:
+            - nbde_server_success is not defined
+            - nbde_server_failed is defined
 
 
     - name: Test 4 - nbde_server_keys_dir is absolute path
@@ -61,12 +87,24 @@
           vars:
             nbde_server_fetch_keys: yes
             nbde_server_keys_dir: ./foobar
-        - name: Should have failed before
-          fail:
-            msg: "Should not run this; previous task should have failed"
+
+        - name: This task should not run
+          debug:
+            msg: Previous task should have failed
+          register: nbde_server_failed
       rescue:
         - debug:
-            msg: "Test succeeded"
+            msg: >
+              Test succeeded. Role failed with nbde_server_keys_dir
+              not absolute path
+          register: nbde_server_success
+      always:
+        - fail:
+            msg: Task should have failed with nbde_server_keys_dir not set
+          when:
+            - nbde_server_success is not defined
+            - nbde_server_failed is defined
+
 
     - name: Test 5 - nbde_server_keys_dir is absolute path
       block:
@@ -76,10 +114,22 @@
           vars:
             nbde_server_fetch_keys: yes
             nbde_server_keys_dir: foobar
-        - name: Should have failed before
-          fail:
-            msg: "Should not run this; previous task should have failed"
+
+        - name: This task should not run
+          debug:
+            msg: Previous task should have failed
+          register: nbde_server_failed
       rescue:
         - debug:
-            msg: "Test succeeded"
+            msg: >
+              Test succeeded. Role failed with nbde_server_keys_dir
+              not absolute path
+          register: nbde_server_success
+      always:
+        - fail:
+            msg: Task should have failed with nbde_server_keys_dir not set
+          when:
+            - nbde_server_success is not defined
+            - nbde_server_failed is defined
+
 # vim:set ts=2 sw=2 et:
