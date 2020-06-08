@@ -45,7 +45,4 @@
     enabled: yes
     state: stopped
 
-- name: Run notified handlers for nbde_server
-  meta: flush_handlers
-
 ## vim:set ts=2 sw=2 et:
