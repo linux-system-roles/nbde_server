@@ -105,23 +105,6 @@ To redeploy keys, they must be placed into subdirectories named after the host t
     - linux-system-roles.nbde_server
 ```
 
-#### Example 5: similar to Example 3,  let's deploy a specific set of keys to every host (same caveat from Example 3 about not being recommended applies)
-
-This is similar to Example 3 in which we will be deploying keys from a directory. However, now the keys intended to be deployed will be located in the top level directory of `nbde_server_keys_dir`, so these keys will be deployed to every host.
-
-```yaml
----
-- hosts: all
-
-  vars:
-    nbde_server_deploy_keys: yes
-    nbde_server_keys_dir: /root/nbde_server/keys
-
-  roles:
-    - linux-system-roles.nbde_server
-```
-
-
 License
 -------
 
