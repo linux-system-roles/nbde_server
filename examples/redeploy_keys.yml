@@ -5,7 +5,6 @@
 # example, to see how it works. Make sure both playbooks use the same
 # nbde_server_keys_dir.
 - hosts: all
-  become: true
 
   vars:
     nbde_server_deploy_keys: yes

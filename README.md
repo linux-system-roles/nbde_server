@@ -55,7 +55,6 @@ Example Playbooks
 ```yaml
 ---
 - hosts: all
-  become: true
 
   roles:
     - linux-system-roles.nbde_server
@@ -65,7 +64,6 @@ Example Playbooks
 ```yaml
 ---
 - hosts: all
-  become: true
 
   vars:
     nbde_server_fetch_keys: yes
@@ -84,7 +82,6 @@ To redeploy keys, they must be placed into subdirectories named after the host t
 ```yaml
 ---
 - hosts: all
-  become: true
 
   vars:
     nbde_server_deploy_keys: yes
@@ -98,7 +95,6 @@ To redeploy keys, they must be placed into subdirectories named after the host t
 ```yaml
 ---
 - hosts: all
-  become: true
 
   vars:
     nbde_server_fetch_keys: yes
@@ -116,7 +112,6 @@ This is similar to Example 3 in which we will be deploying keys from a directory
 ```yaml
 ---
 - hosts: all
-  become: true
 
   vars:
     nbde_server_deploy_keys: yes

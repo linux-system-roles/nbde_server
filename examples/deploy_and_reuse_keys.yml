@@ -3,7 +3,6 @@
 # deploying the other servers. Sharing keys is not recommended, but this
 # is supported.
 - hosts: all
-  become: true
 
   vars:
     nbde_server_fetch_keys: yes

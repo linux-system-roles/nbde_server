@@ -4,7 +4,6 @@
 # the keys in the top level directory of nbde_server_keys_dir, then run this
 # playbook.
 - hosts: all
-  become: true
 
   vars:
     nbde_server_fetch_keys: yes
