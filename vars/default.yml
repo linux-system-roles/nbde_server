@@ -4,6 +4,6 @@
 # Put internal variables here with values for unrecognized distributions.
 
 __nbde_server_packages: []
-__nbde_server_service: ""
+__nbde_server_services: []
 
 # vim:set ts=2 sw=2 et:

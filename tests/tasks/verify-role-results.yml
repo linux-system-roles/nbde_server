@@ -10,33 +10,19 @@
   assert:
     that: not nbde_server_packages_installed.changed
 
-- name: Gather state of service when it should be enabled and started
-  when: state is not defined or state != "stopped"
+- name: Gather state of services
   service:
-    name: "{{ __nbde_server_service }}"
+    name: "{{ item }}"
     enabled: true
     state: started
   check_mode: true
-  register: nbde_server_service_started
+  register: nbde_server_services_state
+  loop: "{{ __nbde_server_services }}"
 
-- name: Check whether service is enabled and started when it should be
-  when: state is not defined or state != "stopped"
+- name: Check services are enabled and started
   assert:
-    that: not nbde_server_service_started.changed
-
-- name: Gather state of service when it should be enabled and stopped
-  when: state is defined or state == "stopped"
-  service:
-    name: "{{ __nbde_server_service }}"
-    enabled: true
-    state: stopped
-  check_mode: true
-  register: nbde_server_service_stopped
-
-- name: Check whether service is enabled and stopped when it should be
-  when: state is defined or state == "stopped"
-  assert:
-    that: not nbde_server_service_stopped.changed
+    that: "{{ not item.changed }}"
+  loop: "{{ nbde_server_services_state.results }}"
 
 - name: Include the appropriate provider verification tasks
   include_tasks: verify-{{ nbde_server_provider }}-results.yml

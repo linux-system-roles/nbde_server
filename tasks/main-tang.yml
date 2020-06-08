@@ -28,21 +28,12 @@
   include: tang-key-management.yml
   notify: nbde_server tang cache update
 
-
-- name: Ensure tang is enabled and started
-  when: state is not defined or state != "stopped"
+- name: Ensure required services are enabled and started
   service:
-    name: "{{ __nbde_server_service }}"
-    enabled: yes
+    name: "{{ item }}"
     state: started
-  notify: nbde_server tang cache update
-
-
-- name: Ensure tang is enabled but stopped
-  when: state is defined and state == "stopped"
-  service:
-    name: "{{ __nbde_server_service }}"
     enabled: yes
-    state: stopped
+  loop: "{{ __nbde_server_services }}"
+  notify: nbde_server tang cache update
 
 ## vim:set ts=2 sw=2 et:

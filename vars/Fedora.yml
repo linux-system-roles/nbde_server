@@ -6,7 +6,8 @@
 __nbde_server_packages:
   - tang
 
-__nbde_server_service: tangd.socket
+__nbde_server_services:
+  - tangd.socket
 
 __nbde_server_keygen: /usr/libexec/tangd-keygen
 __nbde_server_update: /usr/libexec/tangd-update
