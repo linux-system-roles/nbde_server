@@ -120,8 +120,9 @@
     - name: Ensure we perform the keys deployment to tang
       when: nbde_server_deploy_keys
       nbde_server_tang:
-        action: deploy-keys
+        state: keys-deployed
         keydir: "{{ __nbde_server_keydir }}"
+        keygen: "{{ __nbde_server_keygen }}"
         keys_to_deploy_dir: "{{ __nbde_server_remote_workdir }}"
 
 

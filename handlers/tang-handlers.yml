@@ -3,7 +3,7 @@
 # handlers file for nbde_server.
 - name: nbde_server tang cache update
   nbde_server_tang:
-    action: update-cache
+    state: cache-updated
     update: "{{ __nbde_server_update }}"
     keydir: "{{ __nbde_server_keydir }}"
     cachedir: "{{ __nbde_server_cachedir }}"

@@ -1,7 +1,7 @@
 ---
 - name: Gather state of keys
   nbde_server_tang:
-    action: create-keys
+    state: keys-created
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
   check_mode: true

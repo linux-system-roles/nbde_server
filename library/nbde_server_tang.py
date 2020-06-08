@@ -31,37 +31,35 @@ description:
     - "This module performs operations such as key management -- i.e.
         creating/rotating keys -- on a tang server."
 options:
-    action:
+    state:
         description:
-            - indicates an operation to be performed, like the creation of new
-              keys or the rotation of keys.
+            - indicates the state to achieve, which basically maps to
+              certain operations to be performed.
         choices:
-            - rotate-keys:
+            - keys-rotated:
                 - this performs a key rotation followed by the creation of new
                   keys. Required parameters are keygen and keydir, that point
                   to the tang key generation tool and the  tang key directory.
-            - create-keys:
+            - keys-created:
                 - creates a new set of keys, if none exist. As keys-rotated,
                   also take keygen and keydir as arguments, that point to the
-                  tang key generation tool and its key directory. Optionally
-                  takes a force argument, which makes it create new keys
-                  unconditionally.
-            - deploy-keys:
+                  tang key generation tool and its key directory.
+            - keys-deployed:
                 - deploys keys that are present in keys_to_deploy_dir. This
                   argument indicates a directory in the machine that runs the
                   tang server where there are new keys to be deployed to the
-                  tang server. An additional argument is the keydir, which
-                  indicates the keys directory. Note that, since this
-                  directory is in the remote machine, you are expected to
-                  place the keys in there beforehand.
-            - update-cache:
+                  tang server. Additional arguments are keygen  and keydir,
+                  similar to keys-rotated and keys-created. Note that, since
+                  this directory is in the remote machine, you are expected
+                  to place the keys in there beforehand.
+            - cache-updated:
                 - updates the tang server cache. Besides keydir, the keys
                   directory of the server, it requires the following
                   parameters: update, which indicates the tool for performing
                   the tang cache update (usually tangd-update), and cachedir,
                   which indicates the cache directory.
 
-    If no action is specified, no action is performed.
+    If no state is specified, no action is performed.
 
 author:
     - Sergio Correia (scorreia@redhat.com)
@@ -72,24 +70,25 @@ EXAMPLES = """
 ---
 - name: Create new keys
   nbde_server_tang:
-    action: create-keys
+    state: keys-created:
     keygen: /var/libexec/tangd-keygen
     keydir: /var/db/tang
 
 - name: Rotate keys
   nbde_server_tang:
-    action: rotate-keys
+    state: keys-rotated
     keygen: /var/libexec/tangd-keygen
     keydir: /var/db/tang
 
 - name: Deploy keys from /root/keys
-    action: deploy-keys
+    state: keys-rotated
+    keygen: /var/libexec/tangd-keygen
     keydir: /var/db/tang
     keys_to_deploy_dir: /root/keys
 
 - name: Update cache
   nbde_server_tang:
-    action: update-cache
+    state: cache-updated
     update: /var/libexec/tangd-update
     keydir: /var/db/tang
     cachedir: /var/cache/tang
@@ -97,8 +96,8 @@ EXAMPLES = """
 
 
 RETURN = """
-action:
-    description: The action that was passed as argument.
+state:
+    description: The state that was passed as argument.
     type: str
     returned: always
 arguments:
@@ -130,7 +129,7 @@ def generate_tang_keys(module, keygen, keydir):
         )
         raise TangAnsibleError(result)
 
-    return {"changed": True}
+    return {"changed": True, "state": "keys-created"}
 
 
 def create_keys(module, keygen, keydir, force):
@@ -147,7 +146,7 @@ def create_keys(module, keygen, keydir, force):
             result = dict(msg="Listing keys failed: {}".format(to_native(exc)))
             raise TangAnsibleError(result)
 
-    result = {"changed": True}
+    result = {"changed": True, "state": "keys-created"}
     if not module.check_mode:
         result = generate_tang_keys(module, keygen, keydir)
     return result
@@ -253,21 +252,22 @@ def run_module():
     """ The entry point of the module. """
 
     module_args = dict(
+        name=dict(type="str", required=False),
         keygen=dict(type="str", required=False),
         keydir=dict(type="str", required=False),
         cachedir=dict(type="str", required=False),
         update=dict(type="str", required=False),
         force=dict(type="bool", required=False, default=False),
-        action=dict(type="str", required=False),
+        state=dict(type="str", required=False),
         keys_to_deploy_dir=dict(type="str", required=False),
     )
 
-    result = dict(changed=False)
+    result = dict(changed=False, original_message="", message="")
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     params = module.params
-    action = params["action"]
+    state = params["state"]
     keygen = params["keygen"]
     keydir = params["keydir"]
     cachedir = params["cachedir"]
@@ -275,18 +275,18 @@ def run_module():
     force = params["force"]
     keys_to_deploy_dir = params["keys_to_deploy_dir"]
 
-    if action == "create-keys":
+    if state == "keys-created":
         result = create_keys(module, keygen, keydir, force)
-    elif action == "rotate-keys":
+    elif state == "keys-rotated":
         # We will rotate existing keys and then create new keys.
         rotate_keys(module, keydir, None)
         result = create_keys(module, keygen, keydir, force)
-    elif action == "deploy-keys":
+    elif state == "keys-deployed":
         result = deploy_keys(module, keydir, keys_to_deploy_dir)
-    elif action == "update-cache":
+    elif state == "cache-updated":
         result = update_cache(module, keydir, cachedir, update)
 
-    result["action"] = action
+    result["state"] = state
     result["arguments"] = params
     module.exit_json(**result)
 
