@@ -11,7 +11,8 @@
     state: keys-rotated
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
-  notify: nbde_server tang cache update
+    update: "{{ __nbde_server_update }}"
+    cachedir: "{{ __nbde_server_cachedir }}"
 
 
 - name: Ensure we have keys
@@ -20,7 +21,8 @@
     state: keys-created
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
-  notify: nbde_server tang cache update
+    update: "{{ __nbde_server_update }}"
+    cachedir: "{{ __nbde_server_cachedir }}"
 
 
 - name: Perform key management (fetch/deploy) tasks
@@ -34,6 +36,5 @@
     state: started
     enabled: yes
   loop: "{{ __nbde_server_services }}"
-  notify: nbde_server tang cache update
 
 ## vim:set ts=2 sw=2 et:

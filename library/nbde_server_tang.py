@@ -39,11 +39,17 @@ options:
             - keys-rotated:
                 - this performs a key rotation followed by the creation of new
                   keys. Required parameters are keygen and keydir, that point
-                  to the tang key generation tool and the  tang key directory.
+                  to the tang key generation tool and the tang key directory.
+                  Optional arguments are update, which indicates the tool for
+                  performing a cache update, and cachedir, which indicates
+                  the cache directory. When these arguments are provided, the
+                  cache is updated when there are changes.
             - keys-created:
                 - creates a new set of keys, if none exist. As keys-rotated,
                   also take keygen and keydir as arguments, that point to the
-                  tang key generation tool and its key directory.
+                  tang key generation tool and its key directory. Similarly to
+                  keys-rotated, optional arguments update and cachedir can be
+                  passed to keys-created.
             - keys-deployed:
                 - deploys keys that are present in keys_to_deploy_dir. This
                   argument indicates a directory in the machine that runs the
@@ -51,7 +57,9 @@ options:
                   tang server. Additional arguments are keygen  and keydir,
                   similar to keys-rotated and keys-created. Note that, since
                   this directory is in the remote machine, you are expected
-                  to place the keys in there beforehand.
+                  to place the keys in there beforehand. Similar to previous
+                  states, keys-deployed also accepts optional arguments
+                  update and cachedir.
             - cache-updated:
                 - updates the tang server cache. Besides keydir, the keys
                   directory of the server, it requires the following
@@ -71,26 +79,26 @@ EXAMPLES = """
 - name: Create new keys
   nbde_server_tang:
     state: keys-created:
-    keygen: /var/libexec/tangd-keygen
+    keygen: /usr/libexec/tangd-keygen
     keydir: /var/db/tang
 
 - name: Rotate keys
   nbde_server_tang:
     state: keys-rotated
-    keygen: /var/libexec/tangd-keygen
+    keygen: /usr/libexec/tangd-keygen
     keydir: /var/db/tang
 
 - name: Deploy keys from /root/keys
     state: keys-rotated
-    keygen: /var/libexec/tangd-keygen
+    keygen: /usr/libexec/tangd-keygen
     keydir: /var/db/tang
     keys_to_deploy_dir: /root/keys
 
 - name: Update cache
   nbde_server_tang:
     state: cache-updated
-    update: /var/libexec/tangd-update
-    keydir: /var/db/tang
+    update: /usr/libexec/tangd-update
+    keydir: /usr/db/tang
     cachedir: /var/cache/tang
 """
 
@@ -241,10 +249,11 @@ def update_cache(module, keydir, cachedir, update):
     if not os.path.isfile(update):
         return {"changed": False}
 
-    args = [update, keydir, cachedir]
-    ret, _, _ = module.run_command(args)
-    if ret != 0:
-        return {"changed": False}
+    if not module.check_mode:
+        args = [update, keydir, cachedir]
+        ret, _, _ = module.run_command(args)
+        if ret != 0:
+            return {"changed": False}
     return {"changed": True}
 
 
@@ -285,6 +294,10 @@ def run_module():
         result = deploy_keys(module, keydir, keys_to_deploy_dir)
     elif state == "cache-updated":
         result = update_cache(module, keydir, cachedir, update)
+
+    # Update the cache when operations changed the keys.
+    if state != "cache-updated" and result["changed"]:
+        update_cache(module, keydir, cachedir, update)
 
     result["state"] = state
     result["arguments"] = params

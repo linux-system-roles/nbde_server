@@ -124,7 +124,8 @@
         keydir: "{{ __nbde_server_keydir }}"
         keygen: "{{ __nbde_server_keygen }}"
         keys_to_deploy_dir: "{{ __nbde_server_remote_workdir }}"
-
+        update: "{{ __nbde_server_update }}"
+        cachedir: "{{ __nbde_server_cachedir }}"
 
   always:
     - name: Clean up host deployment directory
