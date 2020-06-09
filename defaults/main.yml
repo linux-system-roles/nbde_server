@@ -3,6 +3,12 @@
 # The provider for nbde_server role. Currently 'tang' is supported.
 nbde_server_provider: tang
 
+# nbde_server_service_state indicates the state the nbde_server should be.
+# It can be either started (default) or stopped. started means the server
+# is accepting connections, whereas stopped means it is not accepting
+# connections.
+nbde_server_service_state: started
+
 # nbde_server_rotate_keys indicates whether we should rotate existing keys
 # -- if any -- , then create new keys. Default behavior (no) is to create
 # new keys, if there are none, and don't touch the keys, if they exist.

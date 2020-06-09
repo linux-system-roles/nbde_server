@@ -30,10 +30,11 @@
   include: tang-key-management.yml
   notify: nbde_server tang cache update
 
-- name: Ensure required services are enabled and started
+
+- name: Ensure required services are enabled and at the right state
   service:
     name: "{{ item }}"
-    state: started
+    state: "{{ nbde_server_service_state | default(started) }}"
     enabled: yes
   loop: "{{ __nbde_server_services }}"
 
