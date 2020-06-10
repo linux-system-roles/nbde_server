@@ -254,7 +254,39 @@ def update_cache(module, keydir, cachedir, update):
         ret, _, _ = module.run_command(args)
         if ret != 0:
             return {"changed": False}
+    set_file_ownership_and_perms(module, cachedir)
     return {"changed": True}
+
+
+def get_dir_ownership(module, target):
+    """ Returns the uid/gid from the target directory. """
+
+    if module.check_mode or not os.path.isdir(target):
+        return None, None
+
+    st_info = os.stat(target)
+    uid = st_info.st_uid
+    gid = st_info.st_gid
+    return uid, gid
+
+
+def set_file_ownership_and_perms(module, target):
+    """ Sets the ownership (via uid and gid) and file permissions (0400)
+    to the target directory; uid and gid come from the target dir. """
+
+    if module.check_mode or not os.path.isdir(target):
+        return
+
+    uid, gid = get_dir_ownership(module, target)
+    if not uid or not gid:
+        return
+
+    for listing in os.listdir(target):
+        if not listing.endswith(".jwk"):
+            continue
+        fname = os.path.join(target, listing)
+        os.chown(fname, uid, gid)
+        os.chmod(fname, 0o400)
 
 
 def run_module():
@@ -271,7 +303,7 @@ def run_module():
         keys_to_deploy_dir=dict(type="str", required=False),
     )
 
-    result = dict(changed=False, original_message="", message="")
+    result = dict(changed=False)
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
@@ -296,8 +328,10 @@ def run_module():
         result = update_cache(module, keydir, cachedir, update)
 
     # Update the cache when operations changed the keys.
-    if state != "cache-updated" and result["changed"]:
-        update_cache(module, keydir, cachedir, update)
+    if result["changed"]:
+        set_file_ownership_and_perms(module, keydir)
+        if state != "cache-updated":
+            update_cache(module, keydir, cachedir, update)
 
     result["state"] = state
     result["arguments"] = params
