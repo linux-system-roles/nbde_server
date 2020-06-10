@@ -30,7 +30,7 @@ nbde_server_deploy_keys: no
 # top level directory will be deployed to every remote host, while keys
 # located within subdirectories named after the remote hosts  -- as per
 # the inventory -- will be deployed only to these specific hosts.
-# nbde_server_deploy_keys must be an absolute path. You need to set this
+# nbde_server_keys_dir must be an absolute path. You need to set this
 # to use either nbde_server_fetch_keys and/or nbde_server_deploy_keys.
 nbde_server_keys_dir: ""
 
