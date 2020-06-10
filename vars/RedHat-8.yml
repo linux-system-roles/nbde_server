@@ -13,5 +13,7 @@ __nbde_server_keygen: /usr/libexec/tangd-keygen
 __nbde_server_update: /usr/libexec/tangd-update
 __nbde_server_keydir: /var/db/tang
 __nbde_server_cachedir: /var/cache/tang
+__nbde_server_user: tang
+__nbde_server_group: tang
 
 # vim:set ts=2 sw=2 et:

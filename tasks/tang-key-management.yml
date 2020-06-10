@@ -67,11 +67,23 @@
   block:
     # This tasks cleans up the deployment directory before the deployment
     # starts.
-    - name: Prepare deployment directory
+    - name: Prepare deployment directory - remove
       when: nbde_server_deploy_keys | bool
       file:
         path: "{{ __nbde_server_remote_workdir }}/"
         state: absent
+
+
+    # This tasks creates the deployment directory and locks down its
+    # ownership/permissions.
+    - name: Prepare deployment directory - create
+      when: nbde_server_deploy_keys | bool
+      file:
+        path: "{{ __nbde_server_remote_workdir }}/"
+        state: directory
+        owner: "{{ __nbde_server_user }}"
+        group: "{{ __nbde_server_group }}"
+        mode: 0700
 
 
     # This task gathers the common keys and fills up a nbde_server_common_keys
@@ -91,6 +103,9 @@
       copy:
         src: "{{ item.path }}"
         dest: "{{ __nbde_server_remote_workdir }}/"
+        owner: "{{ __nbde_server_user }}"
+        group: "{{ __nbde_server_group }}"
+        mode: 0400
       loop: "{{ nbde_server_common_keys.files }}"
 
 
@@ -111,6 +126,9 @@
       copy:
         src: "{{ item.path }}"
         dest: "{{ __nbde_server_remote_workdir }}/"
+        owner: "{{ __nbde_server_user }}"
+        group: "{{ __nbde_server_group }}"
+        mode: 0400
       loop: "{{ nbde_server_host_keys.files }}"
 
 

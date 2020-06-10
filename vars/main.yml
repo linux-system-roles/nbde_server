@@ -2,6 +2,6 @@
 ---
 
 # Put internal variables here that are not distribution-specific.
-__nbde_server_remote_workdir: /tmp/.nbde_server_tmp
+__nbde_server_remote_workdir: /var/run/linux-system-roles.nbde_server
 
 # vim:set ts=2 sw=2 et:

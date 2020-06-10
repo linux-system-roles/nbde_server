@@ -5,5 +5,7 @@
 
 __nbde_server_packages: []
 __nbde_server_services: []
+__nbde_server_user: ""
+__nbde_server_group: ""
 
 # vim:set ts=2 sw=2 et:
