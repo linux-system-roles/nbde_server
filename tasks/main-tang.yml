@@ -27,8 +27,7 @@
 
 - name: Perform key management (fetch/deploy) tasks
   when: nbde_server_fetch_keys or nbde_server_deploy_keys
-  include: tang-key-management.yml
-  notify: nbde_server tang cache update
+  include_tasks: tang-key-management.yml
 
 
 - name: Ensure required services are enabled and at the right state
