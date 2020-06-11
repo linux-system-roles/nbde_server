@@ -11,7 +11,6 @@
       nbde_server_keys_dir is not defined
       or not nbde_server_keys_dir.startswith('/')
 
-
 # This task gathers the keys from a tang server, and fills up a
 # nbde_server_keys_to_fetch variable, to be used later in the actual
 # fetching of these keys.
@@ -23,7 +22,6 @@
       - "*.jwk"
       - ".*.jwk"
   register: nbde_server_keys_to_fetch
-
 
 # This task fetches the keys from a tang server and places them in a
 # directory named after the host, inside nbde_server_keys_dir.
@@ -37,7 +35,6 @@
     flat: yes
   loop:
     "{{ nbde_server_keys_to_fetch.files }}"
-
 
 # This tasks fetches the keys from a single server (run_once), and places it
 # in the top level directory of nbde_server_keys_dir. Keys on the top level
@@ -53,7 +50,6 @@
     flat: yes
   loop:
     "{{ nbde_server_keys_to_fetch.files }}"
-
 
 # The actual deployment of keys is done by the nbde_server_tang module, using
 # the keys that are available in a tetmporary directory that holds the keys.
@@ -74,7 +70,6 @@
         suffix: nbde_server_keys
       register: nbde_server_tempdir
 
-
     # This task gathers the common keys and fills up a nbde_server_common_keys
     # variable, to be used later when preparing for deployment.
     - name: Gather common keys to be deployed
@@ -83,7 +78,6 @@
         hidden: yes
       delegate_to: localhost
       register: nbde_server_common_keys
-
 
     # This task copies the common keys to the deployment temp directory,
     # to be deployed later by the nbde_server_tang module.
@@ -99,7 +93,6 @@
         mode: 0400
       loop: "{{ nbde_server_common_keys.files }}"
 
-
     # This task gathers the specific keys fills up a nbde_server_host_keys
     # variable, to be used later when preparing for deployment.
     - name: Gather host keys to be deployed
@@ -108,7 +101,6 @@
         hidden: yes
       delegate_to: localhost
       register: nbde_server_host_keys
-
 
     # This task copies the host keys to the deployment temp directory,
     # to be deployed later by the nbde_server_tang module.
@@ -123,7 +115,6 @@
         group: "{{ __nbde_server_group }}"
         mode: 0400
       loop: "{{ nbde_server_host_keys.files }}"
-
 
     # This tasks perform the actual deploy. The keys are in available in
     # the deployment temp dir and the nbde_server_tang module works

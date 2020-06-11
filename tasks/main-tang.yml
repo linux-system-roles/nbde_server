@@ -4,7 +4,6 @@
     name: "{{ __nbde_server_packages }}"
     state: present
 
-
 - name: Ensure keys are rotated
   when: nbde_server_rotate_keys
   nbde_server_tang:
@@ -13,7 +12,6 @@
     keydir: "{{ __nbde_server_keydir }}"
     update: "{{ __nbde_server_update }}"
     cachedir: "{{ __nbde_server_cachedir }}"
-
 
 - name: Ensure we have keys
   when: not nbde_server_rotate_keys
@@ -24,11 +22,9 @@
     update: "{{ __nbde_server_update }}"
     cachedir: "{{ __nbde_server_cachedir }}"
 
-
 - name: Perform key management (fetch/deploy) tasks
   when: nbde_server_fetch_keys or nbde_server_deploy_keys
   include_tasks: tang-key-management.yml
-
 
 - name: Ensure required services are enabled and at the right state
   service:
