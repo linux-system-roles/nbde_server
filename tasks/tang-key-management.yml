@@ -30,7 +30,7 @@
 - name: Ensure we fetch the host keys
   when:
     - nbde_server_fetch_keys | bool
-    - not nbde_server_deploy_keys
+    - not (nbde_server_deploy_keys | bool)
   fetch:
     src: "{{ item.path }}"
     dest: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}/"
