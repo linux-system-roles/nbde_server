@@ -1,81 +1,36 @@
 ---
 - name: Ensure tang is installed
   package:
-    name: "{{ __nbde_server_package_list }}"
+    name: "{{ __nbde_server_packages }}"
     state: present
 
-
-- name: Ensure tang is enabled and started
-  when: state is not defined or state != "stopped"
-  service:
-    name: "{{ __nbde_server_service }}"
-    enabled: yes
-    state: started
-
-
-- name: Ensure tang is enabled but stopped
-  when: state is defined and state == "stopped"
-  service:
-    name: "{{ __nbde_server_service }}"
-    enabled: yes
-    state: stopped
-
-
 - name: Ensure keys are rotated
-  when: nbde_server_rotate_keys
+  when: nbde_server_rotate_keys | bool
   nbde_server_tang:
     state: keys-rotated
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
-
+    update: "{{ __nbde_server_update }}"
+    cachedir: "{{ __nbde_server_cachedir }}"
 
 - name: Ensure we have keys
-  when: not nbde_server_rotate_keys
+  when: not (nbde_server_rotate_keys | bool)
   nbde_server_tang:
     state: keys-created
     keygen: "{{ __nbde_server_keygen }}"
     keydir: "{{ __nbde_server_keydir }}"
+    update: "{{ __nbde_server_update }}"
+    cachedir: "{{ __nbde_server_cachedir }}"
 
+- name: Perform key management (fetch/deploy) tasks
+  when: (nbde_server_fetch_keys | bool) or (nbde_server_deploy_keys | bool)
+  include_tasks: tang-key-management.yml
 
-- name: Ensure we fetch the server keys
-  when: nbde_server_fetch_keys
-  synchronize:
-    mode: pull
-    src: "{{ __nbde_server_keydir }}/"
-    dest: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
-    delete: yes
-    rsync_opts:
-      - "--chmod=D2755,F644"
+- name: Ensure required services are enabled and at the right state
+  service:
+    name: "{{ item }}"
+    state: "{{ nbde_server_service_state | default(started) }}"
+    enabled: yes
+  loop: "{{ __nbde_server_services }}"
 
-
-- name: Ensure we fetch the created keys for deploying
-  when: nbde_server_deploy_keys
-  run_once: yes
-  synchronize:
-    mode: pull
-    src: "{{ __nbde_server_keydir }}/"
-    dest: "{{ nbde_server_keys_dir }}"
-    delete: yes
-    rsync_opts:
-      - "--chmod=D2755,F644"
-
-
-- name: Ensure we copy specific keys to tang
-  when: nbde_server_deploy_keys
-  check_mode: no
-  synchronize:
-    mode: push
-    src: "{{ nbde_server_keys_dir }}"
-    dest: "{{ __nbde_server_keys_to_deploy_dir }}"
-
-
-- name: Ensure we deploy the specific keys to tang
-  when: nbde_server_deploy_keys
-  nbde_server_tang:
-    state: keys-deployed
-    keydir: "{{ __nbde_server_keydir }}"
-    keys_to_deploy_dir: "{{ nbde_server_keys_dir }}"
-    base_keys_to_deploy_dir: "{{ __nbde_server_keys_to_deploy_dir }}"
-
-
-# vim:set ts=2 sw=2 et:
+## vim:set ts=2 sw=2 et:

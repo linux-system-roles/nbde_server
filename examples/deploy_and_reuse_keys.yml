@@ -1,0 +1,14 @@
+---
+# This playbook will deploy an NBDE server and then use its keys for
+# deploying the other servers. Sharing keys is not recommended, but this
+# is supported.
+- hosts: all
+
+  vars:
+    nbde_server_fetch_keys: yes
+    nbde_server_deploy_keys: yes
+    nbde_server_keys_dir: /root/nbde_server/keys
+
+  roles:
+    - linux-system-roles.nbde_server
+# vim:set ts=2 sw=2 et:

@@ -3,9 +3,9 @@
   hosts: all
 
   roles:
-    - nbde_server
+    - linux-system-roles.nbde_server
 
   tasks:
-    - include_tasks: verify-role-results.yml
+    - include_tasks: tasks/verify-role-results.yml
 
 # vim:set ts=2 sw=2 et:

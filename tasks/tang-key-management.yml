@@ -1,0 +1,143 @@
+---
+# This task makes sure we have nbde_server_keys_dir defined. Since
+# we are now running tasks related to key management, i.e., fetching
+# and deploying of keys, we need this directory to exist.
+# It must also be an absolute path.
+- name: Make sure nbde_server_keys_dir is set
+  fail:
+    msg: >
+      You need to specify nbde_server_keys_dir and it must be an absolute path
+  when: >
+      nbde_server_keys_dir is not defined
+      or not nbde_server_keys_dir.startswith('/')
+
+# This task gathers the keys from a tang server, and fills up a
+# nbde_server_keys_to_fetch variable, to be used later in the actual
+# fetching of these keys.
+- name: Gather keys to be fetched
+  find:
+    paths: "{{ __nbde_server_keydir }}"
+    hidden: yes
+    patterns:
+      - "*.jwk"
+      - ".*.jwk"
+  register: nbde_server_keys_to_fetch
+
+# This task fetches the keys from a tang server and places them in a
+# directory named after the host, inside nbde_server_keys_dir.
+- name: Ensure we fetch the host keys
+  when:
+    - nbde_server_fetch_keys | bool
+    - not (nbde_server_deploy_keys | bool)
+  fetch:
+    src: "{{ item.path }}"
+    dest: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}/"
+    flat: yes
+  loop:
+    "{{ nbde_server_keys_to_fetch.files }}"
+
+# This tasks fetches the keys from a single server (run_once), and places it
+# in the top level directory of nbde_server_keys_dir. Keys on the top level
+# will later be deployed to all other servers.
+- name: Ensure we fetch the keys for deploying in every host
+  when:
+    - nbde_server_fetch_keys | bool
+    - nbde_server_deploy_keys | bool
+  run_once: yes
+  fetch:
+    src: "{{ item.path }}"
+    dest: "{{ nbde_server_keys_dir }}/"
+    flat: yes
+  loop:
+    "{{ nbde_server_keys_to_fetch.files }}"
+
+# The actual deployment of keys is done by the nbde_server_tang module, using
+# the keys that are available in a tetmporary directory that holds the keys.
+# When preparing for deployment, we copy the respective keys to this directory
+# on the managed host.
+# There are 2 steps involved: we first copy the common keys, the ones that
+# may be available in the top level directory of nbde_server_keys_dir, and
+# the specific keys, which may be available in a directory named after the
+# managed host, within nbde_server_keys_dir.
+
+- name: Perform deployment tasks
+  block:
+    # This tasks creates the deployment directory.
+    - name: Prepare deployment directory - create
+      when: nbde_server_deploy_keys | bool
+      tempfile:
+        state: directory
+        suffix: nbde_server_keys
+      register: nbde_server_tempdir
+
+    # This task gathers the common keys and fills up a nbde_server_common_keys
+    # variable, to be used later when preparing for deployment.
+    - name: Gather common keys to be deployed
+      find:
+        paths: "{{ nbde_server_keys_dir }}"
+        hidden: yes
+      delegate_to: localhost
+      register: nbde_server_common_keys
+
+    # This task copies the common keys to the deployment temp directory,
+    # to be deployed later by the nbde_server_tang module.
+    - name: Prepare for deploying keys - common keys
+      when:
+        - nbde_server_deploy_keys | bool
+        - nbde_server_tempdir.path is defined
+      copy:
+        src: "{{ item.path }}"
+        dest: "{{ nbde_server_tempdir.path }}/"
+        owner: "{{ __nbde_server_user }}"
+        group: "{{ __nbde_server_group }}"
+        mode: 0400
+      loop: "{{ nbde_server_common_keys.files }}"
+
+    # This task gathers the specific keys fills up a nbde_server_host_keys
+    # variable, to be used later when preparing for deployment.
+    - name: Gather host keys to be deployed
+      find:
+        paths: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
+        hidden: yes
+      delegate_to: localhost
+      register: nbde_server_host_keys
+
+    # This task copies the host keys to the deployment temp directory,
+    # to be deployed later by the nbde_server_tang module.
+    - name: Prepare for deploying keys - host keys
+      when:
+        - nbde_server_deploy_keys | bool
+        - nbde_server_tempdir.path is defined
+      copy:
+        src: "{{ item.path }}"
+        dest: "{{ nbde_server_tempdir.path }}/"
+        owner: "{{ __nbde_server_user }}"
+        group: "{{ __nbde_server_group }}"
+        mode: 0400
+      loop: "{{ nbde_server_host_keys.files }}"
+
+    # This tasks perform the actual deploy. The keys are in available in
+    # the deployment temp dir and the nbde_server_tang module works
+    # with those.
+    - name: Ensure we perform the keys deployment to tang
+      when:
+        - nbde_server_deploy_keys | bool
+        - nbde_server_tempdir.path is defined
+      nbde_server_tang:
+        state: keys-deployed
+        keydir: "{{ __nbde_server_keydir }}"
+        keygen: "{{ __nbde_server_keygen }}"
+        keys_to_deploy_dir: "{{ nbde_server_tempdir.path }}"
+        update: "{{ __nbde_server_update }}"
+        cachedir: "{{ __nbde_server_cachedir }}"
+
+  always:
+    - name: Clean up host deployment directory
+      when:
+        - nbde_server_deploy_keys | bool
+        - nbde_server_tempdir.path is defined
+      file:
+        path: "{{ nbde_server_tempdir.path }}/"
+        state: absent
+
+# vim:set ts=2 sw=2 et:

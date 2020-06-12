@@ -9,8 +9,6 @@ tang server. """
 
 import os
 import filecmp
-from shutil import copyfile
-from shutil import rmtree
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
@@ -25,16 +23,99 @@ DOCUMENTATION = """
 ---
 module: nbde_server_tang
 
-short_description: Module for performing operations in a tang server
+short_description: Handle key management operations in a tang server.
 
 version_added: "2.5"
 
 description:
     - "This module performs operations such as key management -- i.e.
         creating/rotating keys -- on a tang server."
+options:
+    state:
+        description:
+            - indicates the state to achieve, which basically maps to
+              certain operations to be performed.
+        choices:
+            - keys-rotated:
+                - this performs a key rotation followed by the creation of new
+                  keys. Required parameters are keygen and keydir, that point
+                  to the tang key generation tool and the tang key directory.
+                  Optional arguments are update, which indicates the tool for
+                  performing a cache update, and cachedir, which indicates
+                  the cache directory. When these arguments are provided, the
+                  cache is updated when there are changes.
+            - keys-created:
+                - creates a new set of keys, if none exist. As keys-rotated,
+                  also take keygen and keydir as arguments, that point to the
+                  tang key generation tool and its key directory. Similarly to
+                  keys-rotated, optional arguments update and cachedir can be
+                  passed to keys-created.
+            - keys-deployed:
+                - deploys keys that are present in keys_to_deploy_dir. This
+                  argument indicates a directory in the machine that runs the
+                  tang server where there are new keys to be deployed to the
+                  tang server. Additional arguments are keygen  and keydir,
+                  similar to keys-rotated and keys-created. Note that, since
+                  this directory is in the remote machine, you are expected
+                  to place the keys in there beforehand. Similar to previous
+                  states, keys-deployed also accepts optional arguments
+                  update and cachedir.
+            - cache-updated:
+                - updates the tang server cache. Besides keydir, the keys
+                  directory of the server, it requires the following
+                  parameters: update, which indicates the tool for performing
+                  the tang cache update (usually tangd-update), and cachedir,
+                  which indicates the cache directory.
+
+    If no state is specified, no action is performed.
 
 author:
-    - Sergio Correia
+    - Sergio Correia (scorreia@redhat.com)
+"""
+
+
+EXAMPLES = """
+---
+- name: Create new keys
+  nbde_server_tang:
+    state: keys-created:
+    keygen: /usr/libexec/tangd-keygen
+    keydir: /var/db/tang
+
+- name: Rotate keys
+  nbde_server_tang:
+    state: keys-rotated
+    keygen: /usr/libexec/tangd-keygen
+    keydir: /var/db/tang
+
+- name: Deploy keys from /root/keys
+    state: keys-rotated
+    keygen: /usr/libexec/tangd-keygen
+    keydir: /var/db/tang
+    keys_to_deploy_dir: /root/keys
+
+- name: Update cache
+  nbde_server_tang:
+    state: cache-updated
+    update: /usr/libexec/tangd-update
+    keydir: /usr/db/tang
+    cachedir: /var/cache/tang
+"""
+
+
+RETURN = """
+state:
+    description: The state that was passed as argument.
+    type: str
+    returned: always
+arguments:
+    description: The arguments passed to the module.
+    type: dict
+    returned: always
+msg:
+    description: The output message the module may generate.
+    type: str
+    returned: always
 """
 
 
@@ -46,12 +127,11 @@ def generate_tang_keys(module, keygen, keydir):
     """ Runs the keygen for generating a pair of usable tang keys. """
     args = [keygen, keydir]
 
-    try:
-        ret_code, out, err = module.run_command(args)
-    except Exception as exc:
+    ret, out, err = module.run_command(args)
+    if ret != 0:
         result = dict(
-            msg="tangd-keygen failed: {}".format(to_native(exc)),
-            ret_code=ret_code,
+            msg="tangd-keygen failed: {}".format(err),
+            ret_code=ret,
             stdout=out,
             stderr=err,
         )
@@ -112,44 +192,43 @@ def rotate_keys(module, keydir, newkeys):
     return result
 
 
-def deploy_keys(module, keydir, base_keysdir, keys_to_deploy_dir):
-    """ Depoy a specific set of keys from keys_to_deploy_dir to keydir. """
+def deploy_keys(module, keydir, keys_to_deploy_dir):
+    """ Deploy a specific set of keys from keys_to_deploy_dir to keydir. """
 
     result = {"changed": False}
     rotate_result = {"changed": False}
 
+    if not os.path.isdir(keys_to_deploy_dir):
+        return result
+
     try:
-        new_dir = os.path.join(base_keysdir, keys_to_deploy_dir)
         total_deployed = 0
         list_deployed = []
         locally_rotated = []
         newkeys = {}
 
-        for listing in os.listdir(new_dir):
+        for listing in os.listdir(keys_to_deploy_dir):
             if not listing.endswith(".jwk"):
                 continue
 
             newkeys[listing] = listing
-            src = os.path.join(new_dir, listing)
+            src = os.path.join(keys_to_deploy_dir, listing)
             dst = os.path.join(keydir, listing)
 
             if os.path.exists(dst):
                 if filecmp.cmp(src, dst):
                     continue
-                else:
-                    new_file = ".rotated-" + dst
-                    locally_rotated.append("{} -> {}".format(dst, new_file))
-                    if not module.check_mode:
-                        os.rename(dst, new_file)
+                new_file = ".rotated-" + dst
+                locally_rotated.append("{} -> {}".format(dst, new_file))
+                if not module.check_mode:
+                    module.atomic_move(dst, new_file)
 
             list_deployed.append(dst)
             if not module.check_mode:
-                copyfile(src, dst)
+                module.atomic_move(src, dst)
             total_deployed += 1
 
         rotate_result = rotate_keys(module, keydir, newkeys)
-        # This is just a temp directory.
-        rmtree(base_keysdir)
 
     except Exception as exc:
         result = dict(msg="Keys deployment failed: {}".format(to_native(exc)))
@@ -164,6 +243,52 @@ def deploy_keys(module, keydir, base_keysdir, keys_to_deploy_dir):
     return result
 
 
+def update_cache(module, keydir, cachedir, update):
+    """ Update tang cache. """
+
+    if not os.path.isfile(update):
+        return {"changed": False}
+
+    if not module.check_mode:
+        args = [update, keydir, cachedir]
+        ret, _, _ = module.run_command(args)
+        if ret != 0:
+            return {"changed": False}
+    set_file_ownership_and_perms(module, cachedir)
+    return {"changed": True}
+
+
+def get_dir_ownership(module, target):
+    """ Returns the uid/gid from the target directory. """
+
+    if module.check_mode or not os.path.isdir(target):
+        return None, None
+
+    st_info = os.stat(target)
+    uid = st_info.st_uid
+    gid = st_info.st_gid
+    return uid, gid
+
+
+def set_file_ownership_and_perms(module, target):
+    """ Sets the ownership (via uid and gid) and file permissions (0400)
+    to the target directory; uid and gid come from the target dir. """
+
+    if module.check_mode or not os.path.isdir(target):
+        return
+
+    uid, gid = get_dir_ownership(module, target)
+    if not uid or not gid:
+        return
+
+    for listing in os.listdir(target):
+        if not listing.endswith(".jwk"):
+            continue
+        fname = os.path.join(target, listing)
+        os.chown(fname, uid, gid)
+        os.chmod(fname, 0o400)
+
+
 def run_module():
     """ The entry point of the module. """
 
@@ -171,13 +296,14 @@ def run_module():
         name=dict(type="str", required=False),
         keygen=dict(type="str", required=False),
         keydir=dict(type="str", required=False),
+        cachedir=dict(type="str", required=False),
+        update=dict(type="str", required=False),
         force=dict(type="bool", required=False, default=False),
         state=dict(type="str", required=False),
         keys_to_deploy_dir=dict(type="str", required=False),
-        base_keys_to_deploy_dir=dict(type="str", required=False),
     )
 
-    result = dict(changed=False, original_message="", message="")
+    result = dict(changed=False)
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
@@ -185,9 +311,10 @@ def run_module():
     state = params["state"]
     keygen = params["keygen"]
     keydir = params["keydir"]
+    cachedir = params["cachedir"]
+    update = params["update"]
     force = params["force"]
     keys_to_deploy_dir = params["keys_to_deploy_dir"]
-    base_keysdir = params["base_keys_to_deploy_dir"]
 
     if state == "keys-created":
         result = create_keys(module, keygen, keydir, force)
@@ -196,8 +323,18 @@ def run_module():
         rotate_keys(module, keydir, None)
         result = create_keys(module, keygen, keydir, force)
     elif state == "keys-deployed":
-        result = deploy_keys(module, keydir, base_keysdir, keys_to_deploy_dir)
+        result = deploy_keys(module, keydir, keys_to_deploy_dir)
+    elif state == "cache-updated":
+        result = update_cache(module, keydir, cachedir, update)
 
+    # Update the cache when operations changed the keys.
+    if result["changed"]:
+        set_file_ownership_and_perms(module, keydir)
+        if state != "cache-updated":
+            update_cache(module, keydir, cachedir, update)
+
+    result["state"] = state
+    result["arguments"] = params
     module.exit_json(**result)
 
 

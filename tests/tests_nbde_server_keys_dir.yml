@@ -1,0 +1,101 @@
+---
+# When using either nbde_server_fetch_keys or nbde_server_deploy_keys,
+# nbde_server_keys_dir needs to be set using an absolute path.
+
+- name: Test nbde_server_keys_dir is properly set
+  hosts: all
+
+  tasks:
+    - name: Test 1 - only nbde_server_fetch_keys set
+      block:
+        - name: With nbde_server_fetch_keys
+          import_role:
+            name: linux-system-roles.nbde_server
+          vars:
+            nbde_server_fetch_keys: yes
+
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
+      rescue:
+        - name: Check for error with nbde_server_keys_dir not set
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
+
+
+    - name: Test 2 - only nbde_server_deploy_keys set
+      block:
+        - name: With nbde_server_deploy_keys
+          import_role:
+            name: linux-system-roles.nbde_server
+          vars:
+            nbde_server_deploy_keys: yes
+
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
+      rescue:
+        - name: Check for error with nbde_server_keys_dir not set
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
+
+
+    - name: Test 3 - nbde_server_fetch_keys and nbde_server_deploy_keys set
+      block:
+        - name: With nbde_server_fetch_keys and deploy keys
+          import_role:
+            name: linux-system-roles.nbde_server
+          vars:
+            nbde_server_fetch_keys: yes
+            nbde_server_deploy_keys: yes
+
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
+      rescue:
+        - name: Check for error with nbde_server_keys_dir not set
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
+
+
+    - name: Test 4 - nbde_server_keys_dir is absolute path
+      block:
+        - name: Directory starting with ./
+          import_role:
+            name: linux-system-roles.nbde_server
+          vars:
+            nbde_server_fetch_keys: yes
+            nbde_server_keys_dir: ./foobar
+
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
+      rescue:
+        - name: Check for error with nbde_server_keys_dir not an absolute path
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
+
+
+    - name: Test 5 - nbde_server_keys_dir is absolute path
+      block:
+        - name: Directory without leading ./
+          import_role:
+            name: linux-system-roles.nbde_server
+          vars:
+            nbde_server_fetch_keys: yes
+            nbde_server_keys_dir: foobar
+
+        - name: unreachable task
+          fail:
+            msg: UNREACH
+
+      rescue:
+        - name: Check for error with nbde_server_keys_dir not an absolute path
+          assert:
+            that: ansible_failed_result.msg != 'UNREACH'
+
+# vim:set ts=2 sw=2 et:

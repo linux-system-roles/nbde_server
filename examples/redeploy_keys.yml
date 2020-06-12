@@ -1,0 +1,15 @@
+---
+# Here we need the keys placed inside subdirectories named after each
+# host, as per the inventory. The example lifting keys from the servers
+# does that, so you can run this playbook after running that other
+# example, to see how it works. Make sure both playbooks use the same
+# nbde_server_keys_dir.
+- hosts: all
+
+  vars:
+    nbde_server_deploy_keys: yes
+    nbde_server_keys_dir: /root/nbde_server/keys
+
+  roles:
+    - linux-system-roles.nbde_server
+# vim:set ts=2 sw=2 et:

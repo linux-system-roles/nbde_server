@@ -2,27 +2,29 @@
 ---
 galaxy_info:
   author: Sergio Correia <scorreia@redhat.com>
-  description: Deploy NBDE server
-  galaxy_tags:
-    - system
-    - nbde
-    - server
-    - tang
-    - redhat
-    - rhel
-    - centos
-    - fedora
+  description: >
+    Ansible role for configuring Network-Bound Disk Encryption servers
+    (e.g. tang)
   company: Red Hat, Inc.
   license: MIT
-  min_ansible_version: 2.5
+  min_ansible_version: 2.7
   platforms:
+    - name: Fedora
+      versions:
+        - 31
+        - 32
     - name: EL
       versions:
         - 7
         - 8
-    - name: Fedora
-      versions:
-        - 30
-        - 31
 
+  galaxy_tags:
+    - centos
+    - fedora
+    - redhat
+    - nbde
+    - clevis
+    - tang
+
+dependencies: []
 # vim:set ts=2 sw=2 et:

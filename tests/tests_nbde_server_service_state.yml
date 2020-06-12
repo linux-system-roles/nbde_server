@@ -1,0 +1,70 @@
+---
+# nbde_server_service_state can be either started or stopped. Default is
+# started. started means the server is accepting connections; stopped means
+# it is not accepting connections.
+#
+- name: Test nbde_server_service_state
+  hosts: all
+
+  tasks:
+    - name: not accepting connections specifying state stopped
+      import_role:
+        name: linux-system-roles.nbde_server
+      vars:
+        nbde_server_service_state: stopped
+
+    - name: Gather state of services
+      service:
+        name: "{{ item }}"
+        enabled: yes
+        state: stopped
+      register: nbde_server_state
+      check_mode: yes
+      loop: "{{ __nbde_server_services }}"
+
+    - name: Check whether services were enabled but stopped
+      assert:
+        that: "{{ not item.changed }}"
+      loop: "{{ nbde_server_state.results }}"
+
+
+    - name: accepting connections without specifying state
+      import_role:
+        name: linux-system-roles.nbde_server
+
+    - name: Gather state of services
+      service:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      register: nbde_server_state
+      check_mode: yes
+      loop: "{{ __nbde_server_services }}"
+
+    - name: Check whether services were enabled and started
+      assert:
+        that: "{{ not item.changed }}"
+      loop: "{{ nbde_server_state.results }}"
+
+
+    - name: accepting connections specifying state started
+      import_role:
+        name: linux-system-roles.nbde_server
+      vars:
+        nbde_server_service_state: started
+
+    - name: Gather state of services
+      service:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      register: nbde_server_state
+      check_mode: yes
+      loop: "{{ __nbde_server_services }}"
+
+    - name: Check whether services were enabled and started
+      assert:
+        that: "{{ not item.changed }}"
+      loop: "{{ nbde_server_state.results }}"
+
+# vim:set ts=2 sw=2 et:

@@ -1,0 +1,56 @@
+---
+# Expected behavior of nbde_server_fetch_keys is the following:
+# - if nbde_server_deploy_keys is also set, we fetch the keys of
+#   the first host in the inventory, and use these keys to deploy
+#   in every host. The keys are placed in the top level directory
+#   of nbde_server_keys_dir.
+# - if nbde_server_deploys keys is not set, we fetch the keys of
+#   every host and place them in a directory named after the host,
+#   inside nbde_server_keys_dir.
+
+- name: Test nbde_server_fetch_keys with nbde_server_deploy_keys not set
+  hosts: all
+
+  vars:
+    nbde_server_keys_dir: /tmp/.nbde_server_keys_dir
+
+  tasks:
+    - name: Ensure we have keys
+      import_role:
+        name: linux-system-roles.nbde_server
+
+    - name: Gather keys
+      find:
+        paths: "{{ __nbde_server_keydir }}"
+        hidden: yes
+        patterns:
+          - '*.jwk'
+          - '.*.jwk'
+      register: nbde_server_host_keys
+
+    - name: Clean up nbde_server_keys_dir
+      file:
+        path: "{{ nbde_server_keys_dir }}"
+        state: absent
+
+    - name: Run with nbde_server_deploy_keys not set to check the keys
+      import_role:
+        name: linux-system-roles.nbde_server
+      vars:
+        nbde_server_rotate_keys: no
+        nbde_server_fetch_keys: yes
+        nbde_server_deploy_keys: no
+
+    - name: Check whether the keys were properly fetched
+      stat:
+        path: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}/{{ item.path | basename }}"  # yamllint disable-line rule:line-length
+      loop: "{{ nbde_server_host_keys.files }}"
+      delegate_to: localhost
+      register: nbde_server_local_keys
+
+    - name: Verify the common keys are correct
+      assert:
+        that: "{{ item.stat.exists }}"
+      loop: "{{ nbde_server_local_keys.results }}"
+
+# vim:set ts=2 sw=2 et:

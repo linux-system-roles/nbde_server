@@ -1,7 +1,4 @@
 # SPDX-License-Identifier: MIT
 ---
 
-# Put internal variables here that are not distribution-specific.
-__nbde_server_keys_to_deploy_dir: '/tmp/nbde-keys'
-
 # vim:set ts=2 sw=2 et:
