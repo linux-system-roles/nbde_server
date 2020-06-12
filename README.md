@@ -92,7 +92,8 @@ To redeploy keys, they must be placed into subdirectories named after the host t
     - linux-system-roles.nbde_server
 ```
 
-#### Example 4: deploy an NBDE server and use the same keys in every host (this is not recommended, but it is supported)
+#### Example 4: deploy an NBDE server and use the same keys in every host
+**NOTE** This is not recommended, but it is supported
 ```yaml
 ---
 - hosts: all
