@@ -141,8 +141,8 @@ def generate_tang_keys(module, keygen, keydir):
 
 
 def create_keys(module, keygen, keydir, force):
-    """ In here we create keys, if none exist or do it anyway, if the force
-    parameter is true. """
+    """In here we create keys, if none exist or do it anyway, if the force
+    parameter is true."""
 
     if not force:
         try:
@@ -161,7 +161,7 @@ def create_keys(module, keygen, keydir, force):
 
 
 def rotate_keys(module, keydir, newkeys):
-    """ In here we rotate the existing keys. """
+    """In here we rotate the existing keys."""
 
     result = {"changed": False}
 
@@ -193,7 +193,7 @@ def rotate_keys(module, keydir, newkeys):
 
 
 def deploy_keys(module, keydir, keys_to_deploy_dir):
-    """ Deploy a specific set of keys from keys_to_deploy_dir to keydir. """
+    """Deploy a specific set of keys from keys_to_deploy_dir to keydir."""
 
     result = {"changed": False}
     rotate_result = {"changed": False}
@@ -244,7 +244,7 @@ def deploy_keys(module, keydir, keys_to_deploy_dir):
 
 
 def update_cache(module, keydir, cachedir, update):
-    """ Update tang cache. """
+    """Update tang cache."""
 
     if not os.path.isfile(update):
         return {"changed": False}
@@ -259,7 +259,7 @@ def update_cache(module, keydir, cachedir, update):
 
 
 def get_dir_ownership(module, target):
-    """ Returns the uid/gid from the target directory. """
+    """Returns the uid/gid from the target directory."""
 
     if module.check_mode or not os.path.isdir(target):
         return None, None
@@ -271,8 +271,8 @@ def get_dir_ownership(module, target):
 
 
 def set_file_ownership_and_perms(module, target):
-    """ Sets the ownership (via uid and gid) and file permissions (0400)
-    to the target directory; uid and gid come from the target dir. """
+    """Sets the ownership (via uid and gid) and file permissions (0400)
+    to the target directory; uid and gid come from the target dir."""
 
     if module.check_mode or not os.path.isdir(target):
         return
@@ -290,7 +290,7 @@ def set_file_ownership_and_perms(module, target):
 
 
 def run_module():
-    """ The entry point of the module. """
+    """The entry point of the module."""
 
     module_args = dict(
         name=dict(type="str", required=False),
@@ -339,7 +339,7 @@ def run_module():
 
 
 def main():
-    """ The main function! """
+    """The main function!"""
     run_module()
 
 
