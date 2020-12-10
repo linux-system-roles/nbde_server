@@ -1,5 +1,6 @@
 `nbde_server`
 ======================
+![CI Testing](https://github.com/linux-system-roles/nbde_server/workflows/tox/badge.svg)
 
 Ansible role for configuring Network-Bound Disk Encryption servers (e.g. tang).
 
