@@ -7,6 +7,10 @@
 """ This is an small ansible module for handling some operations related to a
 tang server. """
 
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
 import os
 import filecmp
 
