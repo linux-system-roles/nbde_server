@@ -90,7 +90,7 @@ EXAMPLES = """
 ---
 - name: Create new keys
   nbde_server_tang:
-    state: keys-created:
+    state: keys-created
     keygen: /usr/libexec/tangd-keygen
     keydir: /var/db/tang
 
@@ -101,6 +101,7 @@ EXAMPLES = """
     keydir: /var/db/tang
 
 - name: Deploy keys from /root/keys
+  nbde_server_tang:
     state: keys-rotated
     keygen: /usr/libexec/tangd-keygen
     keydir: /var/db/tang
