@@ -7,6 +7,10 @@
 """ This is an small ansible module for handling some operations related to a
 tang server. """
 
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
 import os
 import filecmp
 
@@ -33,25 +37,33 @@ description:
 options:
     state:
         description:
-            - indicates the state to achieve, which basically maps to
+            - >
+              indicates the state to achieve, which basically maps to
               certain operations to be performed.
+              If no state is specified, no action is performed.
         choices:
-            - keys-rotated:
-                - this performs a key rotation followed by the creation of new
+            - >
+              keys-rotated:
+                - >
+                  this performs a key rotation followed by the creation of new
                   keys. Required parameters are keygen and keydir, that point
                   to the tang key generation tool and the tang key directory.
                   Optional arguments are update, which indicates the tool for
                   performing a cache update, and cachedir, which indicates
                   the cache directory. When these arguments are provided, the
                   cache is updated when there are changes.
-            - keys-created:
-                - creates a new set of keys, if none exist. As keys-rotated,
+            - >
+              keys-created:
+                - >
+                  creates a new set of keys, if none exist. As keys-rotated,
                   also take keygen and keydir as arguments, that point to the
                   tang key generation tool and its key directory. Similarly to
                   keys-rotated, optional arguments update and cachedir can be
                   passed to keys-created.
-            - keys-deployed:
-                - deploys keys that are present in keys_to_deploy_dir. This
+            - >
+              keys-deployed:
+                - >
+                  deploys keys that are present in keys_to_deploy_dir. This
                   argument indicates a directory in the machine that runs the
                   tang server where there are new keys to be deployed to the
                   tang server. Additional arguments are keygen  and keydir,
@@ -60,17 +72,17 @@ options:
                   to place the keys in there beforehand. Similar to previous
                   states, keys-deployed also accepts optional arguments
                   update and cachedir.
-            - cache-updated:
-                - updates the tang server cache. Besides keydir, the keys
+            - >
+              cache-updated:
+                - >
+                  updates the tang server cache. Besides keydir, the keys
                   directory of the server, it requires the following
                   parameters: update, which indicates the tool for performing
                   the tang cache update (usually tangd-update), and cachedir,
                   which indicates the cache directory.
 
-    If no state is specified, no action is performed.
-
 author:
-    - Sergio Correia (scorreia@redhat.com)
+    - Sergio Correia (@scorreia)
 """
 
 
@@ -78,7 +90,7 @@ EXAMPLES = """
 ---
 - name: Create new keys
   nbde_server_tang:
-    state: keys-created:
+    state: keys-created
     keygen: /usr/libexec/tangd-keygen
     keydir: /var/db/tang
 
@@ -89,6 +101,7 @@ EXAMPLES = """
     keydir: /var/db/tang
 
 - name: Deploy keys from /root/keys
+  nbde_server_tang:
     state: keys-rotated
     keygen: /usr/libexec/tangd-keygen
     keydir: /var/db/tang
