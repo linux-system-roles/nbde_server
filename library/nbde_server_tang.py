@@ -82,7 +82,7 @@ options:
                   which indicates the cache directory.
 
 author:
-    - Sergio Correia (@scorreia)
+    - Sergio Correia (@sergio-correia)
 """
 
 
