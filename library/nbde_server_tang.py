@@ -32,54 +32,55 @@ short_description: Handle key management operations in a tang server.
 version_added: "2.5"
 
 description:
+    - "WARNING: Do not use this module directly! It is only for role internal use."
     - "This module performs operations such as key management -- i.e.
         creating/rotating keys -- on a tang server."
 options:
     state:
         description:
-            - >
+            - |
               indicates the state to achieve, which basically maps to
               certain operations to be performed.
               If no state is specified, no action is performed.
-        choices:
-            - >
+            - |
               keys-rotated:
-                - >
-                  this performs a key rotation followed by the creation of new
-                  keys. Required parameters are keygen and keydir, that point
-                  to the tang key generation tool and the tang key directory.
-                  Optional arguments are update, which indicates the tool for
-                  performing a cache update, and cachedir, which indicates
-                  the cache directory. When these arguments are provided, the
-                  cache is updated when there are changes.
-            - >
+              this performs a key rotation followed by the creation of new
+              keys. Required parameters are keygen and keydir, that point
+              to the tang key generation tool and the tang key directory.
+              Optional arguments are update and cachedir.  When these
+              arguments are provided, the cache is updated when there are changes.
+            - |
               keys-created:
-                - >
-                  creates a new set of keys, if none exist. As keys-rotated,
-                  also take keygen and keydir as arguments, that point to the
-                  tang key generation tool and its key directory. Similarly to
-                  keys-rotated, optional arguments update and cachedir can be
-                  passed to keys-created.
-            - >
+              creates a new set of keys, if none exist. As keys-rotated,
+              also take keygen and keydir as arguments, that point to the
+              tang key generation tool and its key directory. Similarly to
+              keys-rotated, optional arguments update and cachedir can be
+              passed to keys-created.
+            - |
               keys-deployed:
-                - >
-                  deploys keys that are present in keys_to_deploy_dir. This
-                  argument indicates a directory in the machine that runs the
-                  tang server where there are new keys to be deployed to the
-                  tang server. Additional arguments are keygen  and keydir,
-                  similar to keys-rotated and keys-created. Note that, since
-                  this directory is in the remote machine, you are expected
-                  to place the keys in there beforehand. Similar to previous
-                  states, keys-deployed also accepts optional arguments
-                  update and cachedir.
-            - >
+              deploys keys that are present in keys_to_deploy_dir. This
+              argument indicates a directory in the machine that runs the
+              tang server where there are new keys to be deployed to the
+              tang server. Additional arguments are keygen  and keydir,
+              similar to keys-rotated and keys-created. Note that, since
+              this directory is in the remote machine, you are expected
+              to place the keys in there beforehand. Similar to previous
+              states, keys-deployed also accepts optional arguments
+              update and cachedir.
+            - |
               cache-updated:
-                - >
-                  updates the tang server cache. Besides keydir, the keys
-                  directory of the server, it requires the following
-                  parameters: update, which indicates the tool for performing
-                  the tang cache update (usually tangd-update), and cachedir,
-                  which indicates the cache directory.
+              updates the tang server cache. Besides keydir, the keys
+              directory of the server, it requires the following
+              parameters: update and cachedir.
+        choices: [ keys-rotated, keys-created, keys-deployed, cache-updated ]
+    keygen:
+        description: tang key teneration tool "/usr/libexec/tangd-keygen"
+    keydir:
+        description: key database directory on the Tang server "/var/db/tang"
+    update:
+        description: the tool for performing a cache update "/usr/libexec/tangd-update"
+    cachedir:
+        description: cache directory
 
 author:
     - Sergio Correia (@sergio-correia)
