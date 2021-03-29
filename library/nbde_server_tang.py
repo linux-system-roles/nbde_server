@@ -11,12 +11,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import os
-import filecmp
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
-
 ANSIBLE_METADATA = {
     "metadata_version": "0.1",
     "status": ["preview"],
@@ -73,14 +67,19 @@ options:
               directory of the server, it requires the following
               parameters: update and cachedir.
         choices: [ keys-rotated, keys-created, keys-deployed, cache-updated ]
+        type: str
     keygen:
         description: tang key teneration tool "/usr/libexec/tangd-keygen"
+        type: str
     keydir:
         description: key database directory on the Tang server "/var/db/tang"
+        type: str
     update:
         description: the tool for performing a cache update "/usr/libexec/tangd-update"
+        type: str
     cachedir:
         description: cache directory
+        type: str
 
 author:
     - Sergio Correia (@sergio-correia)
@@ -133,6 +132,13 @@ msg:
 """
 
 
+import os
+import filecmp
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
+
+
 class TangAnsibleError(Exception):
     """ The exceptions thrown by out module.    """
 
@@ -144,7 +150,7 @@ def generate_tang_keys(module, keygen, keydir):
     ret, out, err = module.run_command(args)
     if ret != 0:
         result = dict(
-            msg="tangd-keygen failed: {}".format(err),
+            msg="tangd-keygen failed: {0}".format(err),
             ret_code=ret,
             stdout=out,
             stderr=err,
@@ -165,7 +171,7 @@ def create_keys(module, keygen, keydir, force):
                     continue
                 return {"changed": False}
         except Exception as exc:
-            result = dict(msg="Listing keys failed: {}".format(to_native(exc)))
+            result = dict(msg="Listing keys failed: {0}".format(to_native(exc)))
             raise TangAnsibleError(result)
 
     result = {"changed": True, "state": "keys-created"}
@@ -191,12 +197,12 @@ def rotate_keys(module, keydir, newkeys):
 
             old_file = os.path.join(keydir, listing)
             new_file = os.path.join(keydir, "." + listing)
-            list_rotated.append("{} -> {}".format(old_file, new_file))
+            list_rotated.append("{0} -> {1}".format(old_file, new_file))
             if not module.check_mode:
                 os.rename(old_file, new_file)
             total_rotated += 1
     except Exception as exc:
-        result = dict(msg="Keys rotation failed: {}".format(to_native(exc)))
+        result = dict(msg="Keys rotation failed: {0}".format(to_native(exc)))
         raise TangAnsibleError(result)
 
     if total_rotated > 0:
@@ -233,7 +239,7 @@ def deploy_keys(module, keydir, keys_to_deploy_dir):
                 if filecmp.cmp(src, dst):
                     continue
                 new_file = ".rotated-" + dst
-                locally_rotated.append("{} -> {}".format(dst, new_file))
+                locally_rotated.append("{0} -> {1}".format(dst, new_file))
                 if not module.check_mode:
                     module.atomic_move(dst, new_file)
 
@@ -245,7 +251,7 @@ def deploy_keys(module, keydir, keys_to_deploy_dir):
         rotate_result = rotate_keys(module, keydir, newkeys)
 
     except Exception as exc:
-        result = dict(msg="Keys deployment failed: {}".format(to_native(exc)))
+        result = dict(msg="Keys deployment failed: {0}".format(to_native(exc)))
         raise TangAnsibleError(result)
 
     if total_deployed > 0 or rotate_result["changed"]:
@@ -265,7 +271,7 @@ def update_cache(module, keydir, cachedir, update):
 
     if not module.check_mode:
         args = [update, keydir, cachedir]
-        ret, _, _ = module.run_command(args)
+        ret, _unused1, _unused2 = module.run_command(args)
         if ret != 0:
             return {"changed": False}
     set_file_ownership_and_perms(module, cachedir)
@@ -359,5 +365,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# vim:set ts=4 sw=4 et:
