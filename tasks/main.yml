@@ -2,6 +2,7 @@
 ---
 # tasks file for nbde_server.
 
+# yamllint disable rule:line-length
 - name: Set version specific variables
   include_vars: "{{ lookup('first_found', ffparams) }}"
   vars:
@@ -14,6 +15,7 @@
         - "default.yml"
       paths:
         - "{{ role_path }}/vars"
+# yamllint enable rule:line-length
 
 - name: Include the appropriate provider tasks
   include_tasks: "main-{{ nbde_server_provider }}.yml"
