@@ -1,4 +1,1 @@
-plugins/modules/nbde_server_tang.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/nbde_server_tang.py validate-modules:missing-gplv3-license
-plugins/modules/nbde_server_tang.py validate-modules:parameter-type-not-in-doc
-plugins/modules/nbde_server_tang.py validate-modules:undocumented-parameter

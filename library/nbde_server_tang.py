@@ -80,6 +80,12 @@ options:
     cachedir:
         description: cache directory
         type: str
+    force:
+        description: force to create keys
+        type: bool
+    keys_to_deploy_dir:
+        description: deploys keys that are present in keys_to_deploy_dir
+        type: str
 
 author:
     - Sergio Correia (@sergio-correia)
@@ -313,13 +319,16 @@ def run_module():
     """The entry point of the module."""
 
     module_args = dict(
-        name=dict(type="str", required=False),
         keygen=dict(type="str", required=False),
         keydir=dict(type="str", required=False),
         cachedir=dict(type="str", required=False),
         update=dict(type="str", required=False),
         force=dict(type="bool", required=False, default=False),
-        state=dict(type="str", required=False),
+        state=dict(
+            type="str",
+            required=False,
+            choices=["keys-rotated", "keys-created", "keys-deployed", "cache-updated"],
+        ),
         keys_to_deploy_dir=dict(type="str", required=False),
     )
 
