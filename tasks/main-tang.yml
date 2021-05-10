@@ -26,6 +26,9 @@
   when: (nbde_server_fetch_keys | bool) or (nbde_server_deploy_keys | bool)
   include_tasks: tang-key-management.yml
 
+- name: Open port in firewalld
+  include_tasks: tangd-custom-port.yml
+
 - name: Ensure required services are enabled and at the right state
   service:
     name: "{{ item }}"
