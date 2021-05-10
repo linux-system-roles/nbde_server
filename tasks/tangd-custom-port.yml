@@ -15,7 +15,7 @@
     - name: Check if directory /etc/systemd/system/tangd.socket.d exist
       stat:
         path: /etc/systemd/system/tangd.socket.d
-      register: systemd__system__tangd_socket
+      register: systemd_system_tangd_socket
 
     # This tasks Create the /etc/systemd/system/tangd.socket.d directory if it does not exist
     - name: Create a directory if it does not exist
@@ -23,7 +23,7 @@
         path: /etc/systemd/system/tangd.socket.d
         state: directory
         mode: '0755'
-      when: systemd__system_tangd_socket.stat.exist
+      when: systemd_system_tangd_socket.stat.exist
 
     # This tasks creates the file with the port entry that we want tangd to listen to 
     - name: Creates the file with the port entry that we want tangd to listen to 
