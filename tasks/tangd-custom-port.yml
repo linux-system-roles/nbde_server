@@ -1,5 +1,5 @@
 ---
-# This task tells SELinux for the port that we want the tangd service to use
+# This task tells SELinux for the port that we want the tangd service to use when distribution Fedora
 - name: Allow the custom port for tangd_port_t in SELinux
   ansible.builtin.import_role:
     name: linux-system-roles.selinux
@@ -8,6 +8,7 @@
       - { ports: '{{ nbde_server_port }}', proto: 'tcp', setype: 'tangd_port_t', state: 'present' }
   when: ansible_selinux.status == "enabled" and ansible_facts["distribution"] == "Fedora"
 
+# This task tells SELinux for the port that we want the tangd service to use when distribution RHEL
 - name: Allow the custom port for tangd_port_t in SELinux
   ansible.builtin.import_role:
     name: rhel-system-roles.selinux
@@ -15,13 +16,6 @@
     selinux_ports:
       - { ports: '{{ nbde_server_port }}', proto: 'tcp', setype: 'tangd_port_t', state: 'present' }
   when: ansible_selinux.status == "enabled" and ansible_facts["distribution"] == "RedHat"
-
-  community.general.seport:
-    ports: "{{ nbde_server_port }}"
-    proto: tcp
-    setype: tangd_port_t
-    state: present
-  when: ansible_selinux.status == "enabled"
 
 # This block creates the override file for systemd with the new port that we have requested
 - name: Create override file
