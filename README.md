@@ -28,7 +28,7 @@ These are the variables that can be passed to the role:
 |`nbde_server_deploy_keys`| `no` |indicates whether we should deploy the keys located in `nbde_server_keys_dir` directory to the remote hosts. You **must** set `nbde_server_keys_dir` to use `nbde_server_deploy_keys`.
 |`nbde_server_keys_dir`| | specifies a directory in the control node that contains keys to be deployed to the remote hosts. Keys located in the top level directory will be deployed to every remote host, while keys located within subdirectories named after the remote hosts  -- as per the inventory -- will be deployed only to these specific hosts. `nbde_server_keys_dir` **must** be an absolute path. You need to set this to use either `nbde_server_fetch_keys` and/or `nbde_server_deploy_keys`.
 |`nbde_server_port`|`80`| setup custom port which will be enabled in SELinux and firewalld.
-|`nbde_server_zone`|`public`| change the default zone where the port should be opened.
+|`nbde_server_firewall_zone`|`public`| change the default zone where the port should be opened.
 
 
 

@@ -1,6 +1,21 @@
 ---
 # This task tells SELinux for the port that we want the tangd service to use
 - name: Allow the custom port for tangd_port_t in SELinux
+  ansible.builtin.import_role:
+    name: linux-system-roles.selinux
+  vars:
+    selinux_ports:
+      - { ports: '{{ nbde_server_port }}', proto: 'tcp', setype: 'tangd_port_t', state: 'present' }
+  when: ansible_selinux.status == "enabled" and ansible_facts["distribution"] == "Fedora"
+
+- name: Allow the custom port for tangd_port_t in SELinux
+  ansible.builtin.import_role:
+    name: rhel-system-roles.selinux
+  vars:
+    selinux_ports:
+      - { ports: '{{ nbde_server_port }}', proto: 'tcp', setype: 'tangd_port_t', state: 'present' }
+  when: ansible_selinux.status == "enabled" and ansible_facts["distribution"] == "RedHat"
+
   community.general.seport:
     ports: "{{ nbde_server_port }}"
     proto: tcp
@@ -31,16 +46,19 @@
         path: /etc/systemd/system/tangd.socket.d/override.conf
         block: |
           [Socket]
+          ListenStream=[]
           ListenStream={{ nbde_server_port }}
         state: present
         create: yes
         mode: '0644'
         marker: "# {mark} ANSIBLE MANAGED BLOCK NBDE"
+      register: __nbde_server_daemon_reload
     
     # This tasks reload the daemons so the new changes take effect
     - name: Reload the daemons so the new changes take effect
       systemd:
         daemon_reload: yes
+      when: __nbde_server_daemon_reload.changed
 
 # This task makes sure that we add the new port to firewalld
 - name: Ensure the desired port is added to firewalld
