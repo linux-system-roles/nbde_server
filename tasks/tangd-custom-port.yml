@@ -40,7 +40,7 @@
         path: /etc/systemd/system/tangd.socket.d/override.conf
         block: |
           [Socket]
-          ListenStream=[]
+          ListenStream=
           ListenStream={{ nbde_server_port }}
         state: present
         create: yes
