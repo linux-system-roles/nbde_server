@@ -7,14 +7,6 @@
     selinux_ports:
       - { ports: '{{ nbde_server_port }}', proto: 'tcp', setype: 'tangd_port_t', state: 'present' }
 
-# This task tells SELinux for the port that we want the tangd service to use when distribution RHEL
-- name: Allow the custom port for tangd_port_t in SELinux
-  import_role:
-    name: rhel-system-roles.selinux
-  vars:
-    selinux_ports:
-      - { ports: '{{ nbde_server_port }}', proto: 'tcp', setype: 'tangd_port_t', state: 'present' }
-
 # This block creates the override file for systemd with the new port that we have requested
 - name: Create override file
   block:
