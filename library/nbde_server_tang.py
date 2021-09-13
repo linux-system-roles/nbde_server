@@ -146,11 +146,11 @@ from ansible.module_utils._text import to_native
 
 
 class TangAnsibleError(Exception):
-    """ The exceptions thrown by out module.    """
+    """The exceptions thrown by out module."""
 
 
 def generate_tang_keys(module, keygen, keydir):
-    """ Runs the keygen for generating a pair of usable tang keys. """
+    """Runs the keygen for generating a pair of usable tang keys."""
     args = [keygen, keydir]
 
     ret, out, err = module.run_command(args)
