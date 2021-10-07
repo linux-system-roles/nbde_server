@@ -69,7 +69,7 @@ options:
         choices: [ keys-rotated, keys-created, keys-deployed, cache-updated ]
         type: str
     keygen:
-        description: tang key teneration tool "/usr/libexec/tangd-keygen"
+        description: tang key generation tool "/usr/libexec/tangd-keygen"
         type: str
     keydir:
         description: key database directory on the Tang server "/var/db/tang"
@@ -83,6 +83,7 @@ options:
     force:
         description: force to create keys
         type: bool
+        default: False
     keys_to_deploy_dir:
         description: deploys keys that are present in keys_to_deploy_dir
         type: str
