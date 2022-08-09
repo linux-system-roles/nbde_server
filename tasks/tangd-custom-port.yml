@@ -4,8 +4,11 @@
   import_role:
     name: linux-system-roles.selinux
   vars:
-    selinux_ports:
-      - { ports: '{{ nbde_server_port }}', proto: 'tcp', setype: 'tangd_port_t', state: 'present' }
+    selinux_ports: 
+      - ports: "{{ nbde_server_port }}"
+        proto: tcp
+        setype: tangd_port_t
+        state: present
 
 # This block creates the override file for systemd with the new port that we have requested
 - name: Create override file
@@ -46,10 +49,13 @@
 
 # This task makes sure that we add the new port to firewalld
 - name: Ensure the desired port is added to firewalld
-  firewalld:
-    port: "{{ nbde_server_port }}/tcp"
-    zone: "{{ nbde_server_firewall_zone }}"
-    state: enabled
-    immediate: yes
-    permanent: yes
+  ansible.builtin.import_role:
+    name: linux-system-roles.firewall
+  vars:
+    firewall: 
+      - port: "{{ nbde_server_port }}/tcp"
+        zone: "{{ nbde_server_firewall_zone }}"
+        state: enabled
+        immediate: yes
+        permanent: yes
 
