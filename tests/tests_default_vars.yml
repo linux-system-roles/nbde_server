@@ -15,5 +15,5 @@
             - nbde_server_fetch_keys
             - nbde_server_rotate_keys
             - nbde_server_keys_dir
-          when: "ansible_version.full is version_compare('2.7', '>=')"
+          when: "ansible_version.full is version_compare('2.9', '>=')"
 # vim:set ts=2 sw=2 et:
