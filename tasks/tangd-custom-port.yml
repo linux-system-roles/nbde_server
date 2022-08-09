@@ -2,7 +2,7 @@
 # This task tells SELinux for the port that we want the tangd service to use when distribution Fedora
 - name: Allow the custom port for tangd_port_t in SELinux
   import_role:
-    name: linux-system-roles.selinux
+    name: fedora.linux-system-roles.selinux
   vars:
     selinux_ports: 
       - ports: "{{ nbde_server_port }}"
@@ -50,7 +50,7 @@
 # This task makes sure that we add the new port to firewalld
 - name: Ensure the desired port is added to firewalld
   import_role:
-    name: linux-system-roles.firewall
+    name: fedora.linux-system-roles.firewall
   vars:
     firewall: 
       - port: "{{ nbde_server_port }}/tcp"
