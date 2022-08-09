@@ -49,7 +49,7 @@
 
 # This task makes sure that we add the new port to firewalld
 - name: Ensure the desired port is added to firewalld
-  ansible.builtin.import_role:
+  import_role:
     name: linux-system-roles.firewall
   vars:
     firewall: 
