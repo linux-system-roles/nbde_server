@@ -1,5 +1,4 @@
 ---
-# This task tells SELinux for the port that we want the tangd service to use when distribution Fedora
 - name: Allow the custom port for tangd_port_t in SELinux
   import_role:
     name: fedora.linux-system-roles.selinux
@@ -10,16 +9,13 @@
         setype: tangd_port_t
         state: present
 
-# This block creates the override file for systemd with the new port that we have requested
-- name: Create override file
+- name: Create override file for systemd for the custom tangd port
   block:
-    # This task checks if the directory /etc/systemd/system/tangd.socket.d exist and registers the value in systemd__system__tangd_socket
     - name: Check if directory /etc/systemd/system/tangd.socket.d exist
       stat:
         path: /etc/systemd/system/tangd.socket.d
       register: systemd_system_tangd_socket
 
-    # This tasks Create the /etc/systemd/system/tangd.socket.d directory if it does not exist
     - name: Create a directory if it does not exist
       file:
         path: /etc/systemd/system/tangd.socket.d
@@ -27,7 +23,6 @@
         mode: '0755'
       when: systemd_system_tangd_socket.stat.exists
 
-    # This tasks creates the file with the port entry that we want tangd to listen to 
     - name: Creates the file with the port entry that we want tangd to listen to 
       blockinfile:
         path: /etc/systemd/system/tangd.socket.d/override.conf
@@ -41,13 +36,11 @@
         marker: "# {mark} ANSIBLE MANAGED BLOCK NBDE"
       register: __nbde_server_daemon_reload
     
-    # This tasks reload the daemons so the new changes take effect
     - name: Reload the daemons so the new changes take effect
       systemd:
         daemon_reload: yes
-      when: __nbde_server_daemon_reload.changed
+      when: __nbde_server_daemon_reload is changed  # no-qe no-handler
 
-# This task makes sure that we add the new port to firewalld
 - name: Ensure the desired port is added to firewalld
   import_role:
     name: fedora.linux-system-roles.firewall
