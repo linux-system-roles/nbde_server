@@ -3,7 +3,7 @@
   import_role:
     name: fedora.linux-system-roles.selinux
   vars:
-    selinux_ports: 
+    selinux_ports:
       - ports: "{{ nbde_server_port }}"
         proto: tcp
         setype: tangd_port_t
@@ -23,7 +23,7 @@
         mode: '0755'
       when: systemd_system_tangd_socket.stat.exists
 
-    - name: Creates the file with the port entry that we want tangd to listen to 
+    - name: Creates the file with the tangd listen port entry
       blockinfile:
         path: /etc/systemd/system/tangd.socket.d/override.conf
         block: |
@@ -35,7 +35,7 @@
         mode: '0644'
         marker: "# {mark} ANSIBLE MANAGED BLOCK NBDE"
       register: __nbde_server_daemon_reload
-    
+
     - name: Reload the daemons so the new changes take effect
       systemd:
         daemon_reload: yes
@@ -45,7 +45,7 @@
   import_role:
     name: fedora.linux-system-roles.firewall
   vars:
-    firewall: 
+    firewall:
       - port: "{{ nbde_server_port }}/tcp"
         zone: "{{ nbde_server_firewall_zone }}"
         state: enabled
