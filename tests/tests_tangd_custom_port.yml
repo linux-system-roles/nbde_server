@@ -14,7 +14,13 @@
         cmd: ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $5}'
       register: __open_ports_output
       failed_when: __open_ports_output.stdout != "*:{{ nbde_server_port }}"
-
+      
+    - name: check if port TCP is open
+      shell:
+        cmd: ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $1}'
+      register: __open_ports_output
+      failed_when: __open_ports_output.stdout != "tcp"
+      
     - name: check if port is opened in firewall
       shell:
         cmd: firewall-cmd --list-all | grep {{ nbde_server_port }}/tcp | awk -F':' '{print $2}' | awk '{gsub(/^[ \t]+| [ \t]+$/,""); print$0}'
