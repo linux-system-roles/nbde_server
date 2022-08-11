@@ -27,6 +27,7 @@
   include_tasks: tang-key-management.yml
 
 - name: Open port in firewalld
+  when: (nbde_server_port != "80") or (nbde_server_firewall_zone != "public")
   include_tasks: tangd-custom-port.yml
 
 - name: Ensure required services are enabled and at the right state
