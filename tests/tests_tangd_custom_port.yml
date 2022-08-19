@@ -1,6 +1,6 @@
 ---
 - name: Test tangd_custom_port
-  hosts: tang_HA
+  hosts: all
   vars:
     nbde_server_port: 7500
     nbde_server_firewall_zone: public
@@ -34,7 +34,7 @@
             awk '{gsub(/^[ \t]+| [ \t]+$/,""); print$0}'
       register: __firewall_output
       failed_when: __firewall_output.stdout != "{{ nbde_server_port }}/tcp"
-  
+
     - name: check if firewall zone is set
       shell:
         cmd: |-
@@ -42,6 +42,7 @@
           firewall-cmd --list-all | grep {{ nbde_server_firewall_zone }} | \
             awk -F' ' '{print $1}'
       register: __firewall_output_zone
-      failed_when: __firewall_output_zone.stdout != "{{ nbde_server_firewall_zone }}"
+      failed_when: >-
+        __firewall_output_zone.stdout != "{{ nbde_server_firewall_zone }}"
 
 # vim:set ts=2 sw=2 et:
