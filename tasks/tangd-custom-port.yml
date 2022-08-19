@@ -40,7 +40,7 @@
   import_role:
     name: linux-system-roles.firewall
   vars:
-    firewall: 
+    firewall:
       - port: "{{ nbde_server_port }}/tcp"
         zone: "{{ nbde_server_firewall_zone }}"
         state: enabled
