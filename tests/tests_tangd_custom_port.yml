@@ -5,38 +5,43 @@
     nbde_server_port: 7500
     nbde_server_firewall_zone: public
   tasks:
-  # install the role with custom role and zone
     - name: install with custom port and firewall zone
       import_role:
-        name: linux-system-roles.nbde_server        
-  
-  # check if the port is in listening mode
+        name: linux-system-roles.nbde_server
+
     - name: check if port is open
       shell:
-        cmd: ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $5}'
+        cmd: |-
+          set -euo pipefail
+          ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $5}'
       register: __open_ports_output
       failed_when: __open_ports_output.stdout != "*:{{ nbde_server_port }}"
-      
-  # check if the port is on the tcp protocol listening mode
+
     - name: check if port TCP is open
       shell:
-        cmd: ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $1}'
+        cmd: |-
+          set -euo pipefail
+          ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $1}'
       register: __open_ports_output
       failed_when: __open_ports_output.stdout != "tcp"
-      
-  # check if the custom port is opened in the firewalld
+
     - name: check if port is opened in firewall
       shell:
-        cmd: firewall-cmd --list-all | grep {{ nbde_server_port }}/tcp | awk -F':' '{print $2}' | awk '{gsub(/^[ \t]+| [ \t]+$/,""); print$0}'
+        cmd: |-
+          set -euo pipefail
+          firewall-cmd --list-all | grep {{ nbde_server_port }}/tcp | \
+            awk -F':' '{print $2}' | \
+            awk '{gsub(/^[ \t]+| [ \t]+$/,""); print$0}'
       register: __firewall_output
       failed_when: __firewall_output.stdout != "{{ nbde_server_port }}/tcp"
   
-  # check if the correct zone is set as default
     - name: check if firewall zone is set
       shell:
-        cmd: firewall-cmd --list-all | grep {{ nbde_server_firewall_zone }} | awk -F' ' '{print $1}'
+        cmd: |-
+          set -euo pipefail
+          firewall-cmd --list-all | grep {{ nbde_server_firewall_zone }} | \
+            awk -F' ' '{print $1}'
       register: __firewall_output_zone
       failed_when: __firewall_output_zone.stdout != "{{ nbde_server_firewall_zone }}"
-
 
 # vim:set ts=2 sw=2 et:
