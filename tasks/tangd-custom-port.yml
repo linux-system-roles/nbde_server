@@ -1,6 +1,9 @@
 ---
+<<<<<<< HEAD
 # This task tells SELinux for the port that we want the tangd
 # service to use when distribution Fedora
+=======
+>>>>>>> 13277438947f4516e3a0dfe31879aee7d18585da
 - name: Allow the custom port for tangd_port_t in SELinux
   import_role:
     name: linux-system-roles.selinux
@@ -11,19 +14,27 @@
         setype: tangd_port_t
         state: present
 
+<<<<<<< HEAD
 # This block creates the override file for systemd with the new
 # port that we have requested
 - name: Create override file
   block:
     # This task checks if the directory /etc/systemd/system/tangd.socket.d
     # exist and registers the value in systemd__system__tangd_socket
+=======
+- name: Create override file for custom port
+  block:
+>>>>>>> 13277438947f4516e3a0dfe31879aee7d18585da
     - name: Check if directory /etc/systemd/system/tangd.socket.d exist
       stat:
         path: /etc/systemd/system/tangd.socket.d
       register: systemd_system_tangd_socket
 
+<<<<<<< HEAD
     # This tasks Create the /etc/systemd/system/tangd.socket.d directory if
     # it does not exist
+=======
+>>>>>>> 13277438947f4516e3a0dfe31879aee7d18585da
     - name: Create a directory if it does not exist
       file:
         path: /etc/systemd/system/tangd.socket.d
@@ -31,12 +42,16 @@
         mode: '0755'
       when: systemd_system_tangd_socket.stat.exists
 
+<<<<<<< HEAD
     # This tasks creates the file with the port entry that we want tangd to
     # listen to
+=======
+>>>>>>> 13277438947f4516e3a0dfe31879aee7d18585da
     - name: Creates the file with the port entry that we want tangd to listen to
       template:
         src: tangd_socket_override.conf.j2
         dest: /etc/systemd/system/tangd.socket.d/override.conf
+<<<<<<< HEAD
         backup: yes
         mode: '0644'
       register: __nbde_server_daemon_reload
@@ -45,9 +60,17 @@
     - name: Reload the daemons so the new changes take effect
       systemd:
         daemon_reload: yes
+=======
+        backup: true
+        mode: '0644'
+      register: __nbde_server_daemon_reload
+
+    - name: Reload the daemons so the new changes take effect
+      systemd:
+        daemon_reload: true
+>>>>>>> 13277438947f4516e3a0dfe31879aee7d18585da
       when: __nbde_server_daemon_reload is changed
 
-# This task makes sure that we add the new port to firewalld
 - name: Ensure the desired port is added to firewalld
   import_role:
     name: linux-system-roles.firewall
@@ -56,5 +79,10 @@
       - port: "{{ nbde_server_port }}/tcp"
         zone: "{{ nbde_server_firewall_zone }}"
         state: enabled
+<<<<<<< HEAD
         immediate: yes
         permanent: yes
+=======
+        immediate: true
+        permanent: true
+>>>>>>> 13277438947f4516e3a0dfe31879aee7d18585da

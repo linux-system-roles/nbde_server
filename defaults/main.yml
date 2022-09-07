@@ -39,9 +39,15 @@ nbde_server_keys_dir: ""
 # will listen on the nbde_server_port/TCP
 nbde_server_port: 80
 
+<<<<<<< HEAD
 # nbde_server_firewall_zone indicate the zone that nbde_server's firewall should
 # write into. The default zone is public. If that is not the case you can change
 # that here. Usually it should be left like that.
+=======
+# nbde_server_firewall_zone indicate the zone that nbde_server's firewall
+# should write into. The default zone is public. If that is not the case you
+# can change that here. Usually it should be left like that.
+>>>>>>> 13277438947f4516e3a0dfe31879aee7d18585da
 nbde_server_firewall_zone: public
 
 # vim:set ts=2 sw=2 et:

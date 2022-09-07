@@ -11,6 +11,13 @@ Supported Distributions
 * RHEL-7+, CentOS-7+
 * Fedora
 
+Requirements
+------------
+
+The role requires additional collections which are specified in `meta/collection-requirements.yml`.  These are not automatically installed.  You must install them like this:
+
+`ansible-galaxy install -vv -r meta/collection-requirements.yml`
+
 Limitations
 -----------
 
