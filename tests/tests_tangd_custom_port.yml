@@ -7,7 +7,7 @@
   tasks:
     - name: install with custom port and firewall zone
       import_role:
-        name: linux-system-roles.nbde_server
+        name: fedora.linux-system-roles.nbde_server
 
     - name: check if port is open
       shell:
