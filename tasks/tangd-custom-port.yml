@@ -29,7 +29,7 @@
         path: /etc/systemd/system/tangd.socket.d
         state: directory
         mode: '0755'
-      when: systemd_system_tangd_socket.stat.exists
+      when: not systemd_system_tangd_socket.stat.exists
 
     # This tasks creates the file with the port entry that we want tangd to
     # listen to
