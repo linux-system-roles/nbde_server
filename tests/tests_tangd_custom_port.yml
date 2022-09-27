@@ -15,7 +15,7 @@
           set -euo pipefail
           ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $5}'
       register: __open_ports_output
-      failed_when: not __open_ports_output.stdout is 
+      failed_when: not __open_ports_output.stdout is
         search(':' ~ (nbde_server_port | string) ~ '$')
 
     - name: check if port TCP is open
@@ -28,7 +28,7 @@
 
     - name: check if port is opened in firewall
       command: >-
-        firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port 
+        firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
         {{ nbde_server_port }}/tcp
       register: __firewall_output
 
