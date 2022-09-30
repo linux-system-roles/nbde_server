@@ -1,0 +1,45 @@
+---
+- name: Test tangd_custom_port
+  hosts: all
+  vars:
+    nbde_server_port: 7500
+    nbde_server_firewall_zone: public
+  tasks:
+    - name: install with custom port and firewall zone
+      import_role:
+        name: linux-system-roles.nbde_server
+
+    - name: check if port is open
+      shell:
+        cmd: |-
+          set -euo pipefail
+          ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $5}'
+      register: __open_ports_output
+      failed_when: not __open_ports_output.stdout is
+        search(':' ~ (nbde_server_port | string) ~ '$')
+
+    - name: check if port TCP is open
+      shell:
+        cmd: |-
+          set -euo pipefail
+          ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $1}'
+      register: __open_ports_output
+      failed_when: __open_ports_output.stdout != "tcp"
+
+    - name: check if port is opened in firewall
+      command: >-
+        firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
+        {{ nbde_server_port }}/tcp
+      register: __firewall_output
+
+    - name: check if firewall zone is set
+      shell:
+        cmd: |-
+          set -euo pipefail
+          firewall-cmd --list-all | grep {{ nbde_server_firewall_zone }} | \
+            awk -F' ' '{print $1}'
+      register: __firewall_output_zone
+      failed_when: >-
+        __firewall_output_zone.stdout != "{{ nbde_server_firewall_zone }}"
+
+# vim:set ts=2 sw=2 et:

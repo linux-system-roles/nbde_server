@@ -34,4 +34,14 @@ nbde_server_deploy_keys: no
 # to use either nbde_server_fetch_keys and/or nbde_server_deploy_keys.
 nbde_server_keys_dir: ""
 
+# nbde_server_port indicate the port that nbde_server's firewall should open.
+# The default port is 80. Tang uses the TCP protocol. Thus the specified port
+# will listen on the nbde_server_port/TCP
+nbde_server_port: 80
+
+# nbde_server_firewall_zone indicate the zone that nbde_server's firewall
+# should write into. The default zone is public. If that is not the case you
+# can change that here. Usually it should be left like that.
+nbde_server_firewall_zone: public
+
 # vim:set ts=2 sw=2 et:

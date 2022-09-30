@@ -11,11 +11,15 @@ Supported Distributions
 * RHEL-7+, CentOS-7+
 * Fedora
 
+Requirements
+------------
+
+The role requires additional collections which are specified in `meta/collection-requirements.yml`.  These are not automatically installed.  You must install them like this:
+
+`ansible-galaxy install -vv -r meta/collection-requirements.yml`
+
 Limitations
 -----------
-
-It is not currently possible to specify a custom port for the NBDE servers configured by this role.
-
 
 Role Variables
 --------------
@@ -30,6 +34,9 @@ These are the variables that can be passed to the role:
 |`nbde_server_fetch_keys`| `no` | indicates whether we should fetch keys to the control node, in which case they will be placed in `nbde_server_keys_dir`. You **must** set `nbde_server_keys_dir` to use `nbde_server_fetch_keys`.
 |`nbde_server_deploy_keys`| `no` |indicates whether we should deploy the keys located in `nbde_server_keys_dir` directory to the remote hosts. You **must** set `nbde_server_keys_dir` to use `nbde_server_deploy_keys`.
 |`nbde_server_keys_dir`| | specifies a directory in the control node that contains keys to be deployed to the remote hosts. Keys located in the top level directory will be deployed to every remote host, while keys located within subdirectories named after the remote hosts  -- as per the inventory -- will be deployed only to these specific hosts. `nbde_server_keys_dir` **must** be an absolute path. You need to set this to use either `nbde_server_fetch_keys` and/or `nbde_server_deploy_keys`.
+|`nbde_server_port`|`80`| setup custom port which will be enabled in SELinux and firewalld.
+|`nbde_server_firewall_zone`|`public`| change the default zone where the port should be opened.
+
 
 
 #### nbde_server_fetch_keys and nbde_server_deploy_keys
@@ -104,6 +111,18 @@ To redeploy keys, they must be placed into subdirectories named after the host t
     nbde_server_deploy_keys: yes
     nbde_server_keys_dir: /root/nbde_server/keys
 
+  roles:
+    - linux-system-roles.nbde_server
+```
+
+#### Example 5: deploy NBDE server with custom port and zone
+```yaml
+---
+- hosts: all
+
+  vars:
+    nbde_server_port: 7500
+    nbde_server_firewall_zone: dmz
   roles:
     - linux-system-roles.nbde_server
 ```
