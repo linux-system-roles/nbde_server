@@ -10,6 +10,8 @@
         proto: tcp
         setype: tangd_port_t
         state: present
+  when:
+    - nbde_server_manage_selinux | bool
 
 # This block creates the override file for systemd with the new
 # port that we have requested
@@ -49,3 +51,5 @@
         state: enabled
         immediate: true
         permanent: true
+  when:
+    - nbde_server_manage_firewall | bool
