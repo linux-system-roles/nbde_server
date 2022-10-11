@@ -4,6 +4,8 @@
   vars:
     nbde_server_port: 7500
     nbde_server_firewall_zone: public
+    nbde_server_manage_firewall: yes
+    nbde_server_manage_selinux: yes
   tasks:
     - name: install with custom port and firewall zone
       import_role:

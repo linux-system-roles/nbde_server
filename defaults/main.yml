@@ -44,4 +44,10 @@ nbde_server_port: 80
 # can change that here. Usually it should be left like that.
 nbde_server_firewall_zone: public
 
+# If true, manage the nbde server port using the firewall role.
+nbde_server_manage_firewall: false
+
+# If true, manage the nbde server port using the selinux role.
+nbde_server_manage_selinux: false
+
 # vim:set ts=2 sw=2 et:
