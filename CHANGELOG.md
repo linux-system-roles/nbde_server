@@ -1,6 +1,31 @@
 Changelog
 =========
 
+[1.2.0] - 2022-11-01
+--------------------
+
+### New Features
+
+- Add support for custom ports (#38)
+
+- Introduce nbde_server_manage_firewall and nbde_server_manage_selinux
+to manage the custom ports implemented in "Add support for custom
+ports (#38)"
+
+- If nbde_server_manage_firewall is set to true, use the firewall
+  role to manage the nbde server port.
+
+- If nbde_server_manage_selinux is set to true, use the selinux
+  role to manage the nbde server port.
+
+### Bug Fixes
+
+- none
+
+### Other Changes
+
+- none
+
 [1.1.5] - 2022-07-19
 --------------------
 
