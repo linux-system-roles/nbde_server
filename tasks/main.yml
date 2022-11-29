@@ -7,6 +7,6 @@
   include_tasks: set_vars.yml
 
 - name: Include the appropriate provider tasks
-  include_tasks: "main-{{ nbde_server_provider }}.yml"
+  include_tasks: main-{{ nbde_server_provider }}.yml
 
 # vim:set ts=2 sw=2 et:

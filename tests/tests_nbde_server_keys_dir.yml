@@ -12,7 +12,7 @@
           import_role:
             name: linux-system-roles.nbde_server
           vars:
-            nbde_server_fetch_keys: yes
+            nbde_server_fetch_keys: true
 
         - name: unreachable task
           fail:
@@ -22,7 +22,6 @@
         - name: Check for error with nbde_server_keys_dir not set
           assert:
             that: ansible_failed_result.msg != 'UNREACH'
-
 
     - name: Test 2 - only nbde_server_deploy_keys set
       block:
@@ -30,7 +29,7 @@
           import_role:
             name: linux-system-roles.nbde_server
           vars:
-            nbde_server_deploy_keys: yes
+            nbde_server_deploy_keys: true
 
         - name: unreachable task
           fail:
@@ -40,7 +39,6 @@
         - name: Check for error with nbde_server_keys_dir not set
           assert:
             that: ansible_failed_result.msg != 'UNREACH'
-
 
     - name: Test 3 - nbde_server_fetch_keys and nbde_server_deploy_keys set
       block:
@@ -48,8 +46,8 @@
           import_role:
             name: linux-system-roles.nbde_server
           vars:
-            nbde_server_fetch_keys: yes
-            nbde_server_deploy_keys: yes
+            nbde_server_fetch_keys: true
+            nbde_server_deploy_keys: true
 
         - name: unreachable task
           fail:
@@ -60,14 +58,13 @@
           assert:
             that: ansible_failed_result.msg != 'UNREACH'
 
-
     - name: Test 4 - nbde_server_keys_dir is absolute path
       block:
         - name: Directory starting with ./
           import_role:
             name: linux-system-roles.nbde_server
           vars:
-            nbde_server_fetch_keys: yes
+            nbde_server_fetch_keys: true
             nbde_server_keys_dir: ./foobar
 
         - name: unreachable task
@@ -79,14 +76,13 @@
           assert:
             that: ansible_failed_result.msg != 'UNREACH'
 
-
     - name: Test 5 - nbde_server_keys_dir is absolute path
       block:
         - name: Directory without leading ./
           import_role:
             name: linux-system-roles.nbde_server
           vars:
-            nbde_server_fetch_keys: yes
+            nbde_server_fetch_keys: true
             nbde_server_keys_dir: foobar
 
         - name: unreachable task
