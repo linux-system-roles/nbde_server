@@ -1,6 +1,32 @@
 Changelog
 =========
 
+[1.3.0] - 2022-11-29
+--------------------
+
+### New Features
+
+- none
+
+### Bug Fixes
+
+- fix behavior of manage_firewall and manage_selinux; ansible-lint 6.x (#69)
+
+If `nbde_server_manage_firewall: true`, manage firewall for the port,
+even if not using a custom port.
+If `nbde_server_manage_selinux: true`, manage SELinux for the port,
+even if not using a custom port.
+Clean up role for ansible-lint 6.x
+If using the default port, remove the tangd socket file and systemd
+directory, if any, and reload systemd.
+Add test to check resetting the port works
+Improve test to check for port to handle cases where there are processes
+running on the test system with similar ports open
+
+### Other Changes
+
+- none
+
 [1.2.0] - 2022-11-01
 --------------------
 
