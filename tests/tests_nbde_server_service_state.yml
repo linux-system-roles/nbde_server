@@ -16,17 +16,16 @@
     - name: Gather state of services
       service:
         name: "{{ item }}"
-        enabled: yes
+        enabled: true
         state: stopped
       register: nbde_server_state
-      check_mode: yes
+      check_mode: true
       loop: "{{ __nbde_server_services }}"
 
     - name: Check whether services were enabled but stopped
       assert:
         that: "{{ not item.changed }}"
       loop: "{{ nbde_server_state.results }}"
-
 
     - name: accepting connections without specifying state
       import_role:
@@ -35,17 +34,16 @@
     - name: Gather state of services
       service:
         name: "{{ item }}"
-        enabled: yes
+        enabled: true
         state: started
       register: nbde_server_state
-      check_mode: yes
+      check_mode: true
       loop: "{{ __nbde_server_services }}"
 
     - name: Check whether services were enabled and started
       assert:
         that: "{{ not item.changed }}"
       loop: "{{ nbde_server_state.results }}"
-
 
     - name: accepting connections specifying state started
       import_role:
@@ -56,10 +54,10 @@
     - name: Gather state of services
       service:
         name: "{{ item }}"
-        enabled: yes
+        enabled: true
         state: started
       register: nbde_server_state
-      check_mode: yes
+      check_mode: true
       loop: "{{ __nbde_server_services }}"
 
     - name: Check whether services were enabled and started

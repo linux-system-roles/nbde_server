@@ -27,16 +27,25 @@
         (nbde_server_deploy_keys | bool)
   include_tasks: tang-key-management.yml
 
-- name: Open port in firewalld
-  when: (nbde_server_port | int != 80) or
-        (nbde_server_firewall_zone != "public")
+- name: Manage firewall and SELinux for port
   include_tasks: tangd-custom-port.yml
+
+# This tasks reload the daemons so the new changes take effect
+- name: Reload the daemons so the new changes take effect
+  systemd:
+    daemon_reload: true
+  when: __nbde_server_port_changed | d(false) | bool
 
 - name: Ensure required services are enabled and at the right state
   service:
     name: "{{ item }}"
-    state: "{{ nbde_server_service_state | default(started) }}"
-    enabled: yes
+    state: "{{ __state }}"
+    enabled: true
   loop: "{{ __nbde_server_services }}"
+  vars:
+    __state: "{{ nbde_server_service_state if
+      nbde_server_service_state != 'started' else
+      'restarted' if __nbde_server_port_changed else
+      'started' }}"
 
 ## vim:set ts=2 sw=2 et:

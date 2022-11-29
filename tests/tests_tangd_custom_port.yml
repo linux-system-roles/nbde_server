@@ -4,35 +4,38 @@
   vars:
     nbde_server_port: 7500
     nbde_server_firewall_zone: public
-    nbde_server_manage_firewall: yes
-    nbde_server_manage_selinux: yes
+    nbde_server_manage_firewall: true
+    nbde_server_manage_selinux: true
   tasks:
     - name: install with custom port and firewall zone
-      import_role:
+      include_role:
         name: linux-system-roles.nbde_server
 
     - name: check if port is open
       shell:
         cmd: |-
           set -euo pipefail
-          ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $5}'
+          ss -tulpn | grep ':{{ nbde_server_port }} ' | awk -F' ' '{print $5}'
       register: __open_ports_output
       failed_when: not __open_ports_output.stdout is
         search(':' ~ (nbde_server_port | string) ~ '$')
+      changed_when: false
 
     - name: check if port TCP is open
       shell:
         cmd: |-
           set -euo pipefail
-          ss -tulpn | grep {{ nbde_server_port }} | awk -F' ' '{print $1}'
+          ss -tulpn | grep ':{{ nbde_server_port }} ' | awk -F' ' '{print $1}'
       register: __open_ports_output
       failed_when: __open_ports_output.stdout != "tcp"
+      changed_when: false
 
     - name: check if port is opened in firewall
       command: >-
         firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
         {{ nbde_server_port }}/tcp
       register: __firewall_output
+      changed_when: false
 
     - name: check if firewall zone is set
       shell:
@@ -43,5 +46,52 @@
       register: __firewall_output_zone
       failed_when: >-
         __firewall_output_zone.stdout != "{{ nbde_server_firewall_zone }}"
+      changed_when: false
+
+    - name: install with default port and firewall zone
+      include_role:
+        name: linux-system-roles.nbde_server
+      vars:
+        nbde_server_port: 80
+        nbde_server_firewall_zone: public
+        nbde_server_manage_firewall: true
+        nbde_server_manage_selinux: true
+
+    - name: check if port is open
+      shell:
+        cmd: |-
+          set -euo pipefail
+          ss -tulpn | grep ':80 ' | awk -F' ' '{print $5}'
+      register: __open_ports_output
+      failed_when: not __open_ports_output.stdout is
+        search(':80$')
+      changed_when: false
+
+    - name: check if port TCP is open
+      shell:
+        cmd: |-
+          set -euo pipefail
+          ss -tulpn | grep ':80 ' | awk -F' ' '{print $1}'
+      register: __open_ports_output
+      failed_when: __open_ports_output.stdout != "tcp"
+      changed_when: false
+
+    - name: check if port is opened in firewall
+      command: >-
+        firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
+        80/tcp
+      register: __firewall_output
+      changed_when: false
+
+    - name: check if firewall zone is set
+      shell:
+        cmd: |-
+          set -euo pipefail
+          firewall-cmd --list-all | grep {{ nbde_server_firewall_zone }} | \
+            awk -F' ' '{print $1}'
+      register: __firewall_output_zone
+      failed_when: >-
+        __firewall_output_zone.stdout != "{{ nbde_server_firewall_zone }}"
+      changed_when: false
 
 # vim:set ts=2 sw=2 et:

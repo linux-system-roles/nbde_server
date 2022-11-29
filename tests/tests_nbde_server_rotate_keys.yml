@@ -15,11 +15,11 @@
       find:
         paths: "{{ __nbde_server_keydir }}"
         file_type: file
-        recurse: no
+        recurse: false
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
-      check_mode: yes
+          - "*.jwk"
+          - ".*.jwk"
+      check_mode: true
       register: nbde_server_keys
 
     - name: Run with nbde_server_rotate_keys not set to check keys
@@ -32,11 +32,11 @@
       find:
         paths: "{{ __nbde_server_keydir }}"
         file_type: file
-        recurse: no
+        recurse: false
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
-      check_mode: yes
+          - "*.jwk"
+          - ".*.jwk"
+      check_mode: true
       register: nbde_server_rotate_not_set
 
     - name: Check whether keys changed - nbde_server_rotate_keys not set
@@ -53,11 +53,11 @@
       find:
         paths: "{{ __nbde_server_keydir }}"
         file_type: file
-        recurse: no
+        recurse: false
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
-      check_mode: yes
+          - "*.jwk"
+          - ".*.jwk"
+      check_mode: true
       register: nbde_server_rotate_set
 
     - name: Check whether keys changed - nbde_server_rotate_keys set

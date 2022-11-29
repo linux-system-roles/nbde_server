@@ -13,17 +13,17 @@ nbde_server_service_state: started
 # -- if any -- , then create new keys. Default behavior (no) is to create
 # new keys, if there are none, and don't touch the keys, if they exist.
 # If set to yes, existing keys will be rotated and new keys will be created.
-nbde_server_rotate_keys: no
+nbde_server_rotate_keys: false
 
 # nbde_server_fetch_keys indicates whether we should fetch keys to the
 # control node, in which case they will be placed in nbde_server_keys_dir.
 # You must set nbde_server_keys_dir to use `nbde_server_fetch_keys.
-nbde_server_fetch_keys: no
+nbde_server_fetch_keys: false
 
 # nbde_server_deploy_keys indicates whether we should deploy the keys
 # located in nbde_server_keys_dir directory to the remote hosts. You must
 # set nbde_server_keys_dir to use nbde_server_deploy_keys.
-nbde_server_deploy_keys: no
+nbde_server_deploy_keys: false
 
 # nbde_server_keys_dir specifies a directory in the control node that
 # contains keys to be deployed to the remote hosts. Keys located in the

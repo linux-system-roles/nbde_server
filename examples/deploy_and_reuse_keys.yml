@@ -5,8 +5,8 @@
 - hosts: all
 
   vars:
-    nbde_server_fetch_keys: yes
-    nbde_server_deploy_keys: yes
+    nbde_server_fetch_keys: true
+    nbde_server_deploy_keys: true
     nbde_server_keys_dir: /root/nbde_server/keys
 
   roles:

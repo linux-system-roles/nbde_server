@@ -24,32 +24,32 @@
       import_role:
         name: linux-system-roles.nbde_server
       vars:
-        nbde_server_fetch_keys: yes
-        nbde_server_deploy_keys: no
+        nbde_server_fetch_keys: true
+        nbde_server_deploy_keys: false
 
     - name: Gather keys before redeploy
       find:
         paths: "{{ __nbde_server_keydir }}"
-        hidden: yes
+        hidden: true
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
+          - "*.jwk"
+          - ".*.jwk"
       register: nbde_server_keys_before_redeploy
 
     - name: Redeploy these same keys
       import_role:
         name: linux-system-roles.nbde_server
       vars:
-        nbde_server_fetch_keys: no
-        nbde_server_deploy_keys: yes
+        nbde_server_fetch_keys: false
+        nbde_server_deploy_keys: true
 
     - name: Gather keys after redeploy
       find:
         paths: "{{ __nbde_server_keydir }}"
-        hidden: yes
+        hidden: true
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
+          - "*.jwk"
+          - ".*.jwk"
       register: nbde_server_keys_after_redeploy
 
     - name: Verify the keys are the same

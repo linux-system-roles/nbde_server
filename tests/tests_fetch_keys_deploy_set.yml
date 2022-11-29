@@ -25,13 +25,13 @@
         name: linux-system-roles.nbde_server
 
     - name: Gather common keys, from the first host in the inventory
-      run_once: yes
+      run_once: true
       find:
         paths: "{{ __nbde_server_keydir }}"
-        hidden: yes
+        hidden: true
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
+          - "*.jwk"
+          - ".*.jwk"
       register: nbde_server_host_common_keys
 
     - name: Clean up nbde_server_keys_dir
@@ -43,9 +43,9 @@
       import_role:
         name: linux-system-roles.nbde_server
       vars:
-        nbde_server_rotate_keys: no
-        nbde_server_fetch_keys: yes
-        nbde_server_deploy_keys: yes
+        nbde_server_rotate_keys: false
+        nbde_server_fetch_keys: true
+        nbde_server_deploy_keys: true
 
     - name: Check whether the common keys were properly fetched
       stat:
@@ -62,10 +62,10 @@
     - name: Gather local host keys to verify deploy
       find:
         paths: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
-        hidden: yes
+        hidden: true
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
+          - "*.jwk"
+          - ".*.jwk"
       delegate_to: localhost
       register: nbde_server_local_host_keys
 
@@ -83,16 +83,16 @@
     - name: Gather local common keys to verify deploy
       find:
         paths: "{{ nbde_server_keys_dir }}"
-        hidden: yes
+        hidden: true
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
+          - "*.jwk"
+          - ".*.jwk"
       delegate_to: localhost
       register: nbde_server_local_common_keys
 
     - name: Check whether the local common keys were properly deployed
       stat:
-        path="{{ __nbde_server_keydir }}/{{ item.path | basename }}"
+        path: "{{ __nbde_server_keydir }}/{{ item.path | basename }}"
       loop: "{{ nbde_server_local_common_keys.files }}"
       register: nbde_server_deployed_common_keys
 

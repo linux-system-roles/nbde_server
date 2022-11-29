@@ -22,10 +22,10 @@
     - name: Gather keys
       find:
         paths: "{{ __nbde_server_keydir }}"
-        hidden: yes
+        hidden: true
         patterns:
-          - '*.jwk'
-          - '.*.jwk'
+          - "*.jwk"
+          - ".*.jwk"
       register: nbde_server_host_keys
 
     - name: Clean up nbde_server_keys_dir
@@ -37,9 +37,9 @@
       import_role:
         name: linux-system-roles.nbde_server
       vars:
-        nbde_server_rotate_keys: no
-        nbde_server_fetch_keys: yes
-        nbde_server_deploy_keys: no
+        nbde_server_rotate_keys: false
+        nbde_server_fetch_keys: true
+        nbde_server_deploy_keys: false
 
     - name: Check whether the keys were properly fetched
       stat:

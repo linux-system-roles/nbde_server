@@ -1,7 +1,5 @@
 ---
-# This task tells SELinux for the port that we want the tangd
-# service to use when distribution Fedora
-- name: Allow the custom port for tangd_port_t in SELinux
+- name: Ensure tang port is labeled tangd_port_t for SELinux
   import_role:
     name: fedora.linux_system_roles.selinux
   vars:
@@ -10,36 +8,35 @@
         proto: tcp
         setype: tangd_port_t
         state: present
-  when:
-    - nbde_server_manage_selinux | bool
+        local: true
+  when: nbde_server_manage_selinux | bool
 
-# This block creates the override file for systemd with the new
-# port that we have requested
-- name: Create override file
-  block:
-    # This tasks Create the /etc/systemd/system/tangd.socket.d directory if
-    # it does not exist
-    - name: Create a directory if it does not exist
-      file:
-        path: /etc/systemd/system/tangd.socket.d
-        state: directory
-        mode: '0755'
+# If using default port, ensure directory does not exist
+# If not using default port, create directory
+- name: Manage tangd custom port systemd directory
+  file:
+    path: /etc/systemd/system/tangd.socket.d
+    state: "{{ (nbde_server_port | int == 80) |
+      ternary('absent', 'directory') }}"
+    mode: "0755"
+  register: __nbde_server_custom_dir
 
-    # This tasks creates the file with the port entry that we want tangd to
-    # listen to
-    - name: Creates the file with the port entry that we want tangd to listen to
-      template:
-        src: tangd_socket_override.conf.j2
-        dest: /etc/systemd/system/tangd.socket.d/override.conf
-        backup: true
-        mode: '0644'
-      register: __nbde_server_daemon_reload
+# This tasks creates the file with the port entry that we want tangd to
+# listen to
+- name: Creates the file with the port entry that we want tangd to listen to
+  template:
+    src: tangd_socket_override.conf.j2
+    dest: /etc/systemd/system/tangd.socket.d/override.conf
+    backup: true
+    mode: "0644"
+  when: nbde_server_port | int != 80
+  register: __nbde_server_custom_file
 
-    # This tasks reload the daemons so the new changes take effect
-    - name: Reload the daemons so the new changes take effect
-      systemd:
-        daemon_reload: true
-      when: __nbde_server_daemon_reload is changed
+- name: Set flag to to tell main that the port has changed
+  set_fact:
+    __nbde_server_port_changed: "{{
+      __nbde_server_custom_dir is changed or
+      __nbde_server_custom_file is changed }}"
 
 - name: Ensure the desired port is added to firewalld
   import_role:
@@ -51,5 +48,4 @@
         state: enabled
         immediate: true
         permanent: true
-  when:
-    - nbde_server_manage_firewall | bool
+  when: nbde_server_manage_firewall | bool

@@ -30,14 +30,14 @@ These are the variables that can be passed to the role:
 |----------|-------------|------|
 | `nbde_server_provider` | `tang` | identifies the provider for `nbde_server` role. We currently support `tang` as an `nbde_server` provider, meaning that the `nbde_server` role is currently able to provision/deploy tang servers.
 | `nbde_server_service_state` | `started` | indicates the state the nbde_server should be. It can be either `started` (default) or `stopped`. `started` means the server is accepting connections, whereas `stopped` means it is not accepting connections.
-| `nbde_server_rotate_keys`| `no` | indicates whether we should rotate existing keys -- if any -- , then create new keys. Default behavior (`no`) is to create new keys, if there are none, and don't touch the keys, if they exist. If set to `yes`, existing keys will be rotated and new keys will be created.
-|`nbde_server_fetch_keys`| `no` | indicates whether we should fetch keys to the control node, in which case they will be placed in `nbde_server_keys_dir`. You **must** set `nbde_server_keys_dir` to use `nbde_server_fetch_keys`.
-|`nbde_server_deploy_keys`| `no` |indicates whether we should deploy the keys located in `nbde_server_keys_dir` directory to the remote hosts. You **must** set `nbde_server_keys_dir` to use `nbde_server_deploy_keys`.
+| `nbde_server_rotate_keys`| `false` | indicates whether we should rotate existing keys -- if any -- , then create new keys. Default behavior (`false`) is to create new keys, if there are none, and don't touch the keys, if they exist. If set to `true`, existing keys will be rotated and new keys will be created.
+|`nbde_server_fetch_keys`| `false` | indicates whether we should fetch keys to the control node, in which case they will be placed in `nbde_server_keys_dir`. You **must** set `nbde_server_keys_dir` to use `nbde_server_fetch_keys`.
+|`nbde_server_deploy_keys`| `false` |indicates whether we should deploy the keys located in `nbde_server_keys_dir` directory to the remote hosts. You **must** set `nbde_server_keys_dir` to use `nbde_server_deploy_keys`.
 |`nbde_server_keys_dir`| | specifies a directory in the control node that contains keys to be deployed to the remote hosts. Keys located in the top level directory will be deployed to every remote host, while keys located within subdirectories named after the remote hosts  -- as per the inventory -- will be deployed only to these specific hosts. `nbde_server_keys_dir` **must** be an absolute path. You need to set this to use either `nbde_server_fetch_keys` and/or `nbde_server_deploy_keys`.
-|`nbde_server_manage_firewall`| `no` | manage the nbde server port and zone using the `firewall` role if set to `yes`.
-|`nbde_server_manage_selinux`| `no` | manage the nbde server port using the `selinux` role if set to `yes`.
-|`nbde_server_port`| `80` | setup custom port which will be enabled in SELinux and firewalld. You **must** set `nbde_server_manage_selinux` and `nbde_server_manage_firewall` to `yes` to enable the port, respectively.
-|`nbde_server_firewall_zone`| `public` | change the default zone where the port should be opened. You **must** set `nbde_server_manage_firewall` to `yes` to change the default zone.
+|`nbde_server_manage_firewall`| `false` | manage the nbde server port and zone using the `firewall` role if set to `true`.
+|`nbde_server_manage_selinux`| `false` | manage the nbde server port using the `selinux` role if set to `true`.
+|`nbde_server_port`| `80` | port number that tangd will listen on.  You **must** set `nbde_server_manage_selinux: true` if you want the role to manage SELinux labeling for the port.  You **must** set `nbde_server_manage_firewall: true` if you want the role to manage firewall for the port.
+|`nbde_server_firewall_zone`| `public` | change the default zone where the port should be opened. You **must** set `nbde_server_manage_firewall: true` to change the default zone.
 
 
 
@@ -77,7 +77,7 @@ Example Playbooks
 - hosts: all
 
   vars:
-    nbde_server_fetch_keys: yes
+    nbde_server_fetch_keys: true
     nbde_server_keys_dir: /root/nbde_server/keys
 
   roles:
@@ -95,7 +95,7 @@ To redeploy keys, they must be placed into subdirectories named after the host t
 - hosts: all
 
   vars:
-    nbde_server_deploy_keys: yes
+    nbde_server_deploy_keys: true
     nbde_server_keys_dir: /root/nbde_server/keys
 
   roles:
@@ -109,8 +109,8 @@ To redeploy keys, they must be placed into subdirectories named after the host t
 - hosts: all
 
   vars:
-    nbde_server_fetch_keys: yes
-    nbde_server_deploy_keys: yes
+    nbde_server_fetch_keys: true
+    nbde_server_deploy_keys: true
     nbde_server_keys_dir: /root/nbde_server/keys
 
   roles:
@@ -123,8 +123,8 @@ To redeploy keys, they must be placed into subdirectories named after the host t
 - hosts: all
 
   vars:
-    nbde_server_manage_firewall: yes
-    nbde_server_manage_selinux: yes
+    nbde_server_manage_firewall: true
+    nbde_server_manage_selinux: true
     nbde_server_port: 7500
     nbde_server_firewall_zone: dmz
   roles:
