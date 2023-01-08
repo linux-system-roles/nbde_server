@@ -4,8 +4,8 @@
   gather_facts: false
   roles:
     - linux-system-roles.nbde_server
-
   tasks:
-    - include_tasks: tasks/verify-role-results.yml
+    - name: Verify role results
+      include_tasks: tasks/verify-role-results.yml
 
 # vim:set ts=2 sw=2 et:

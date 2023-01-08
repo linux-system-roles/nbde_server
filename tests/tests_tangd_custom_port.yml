@@ -7,11 +7,11 @@
     nbde_server_manage_firewall: true
     nbde_server_manage_selinux: true
   tasks:
-    - name: install with custom port and firewall zone
+    - name: Install with custom port and firewall zone
       include_role:
         name: linux-system-roles.nbde_server
 
-    - name: check if port is open
+    - name: Check if port is open
       shell:
         cmd: |-
           set -euo pipefail
@@ -21,7 +21,7 @@
         search(':' ~ (nbde_server_port | string) ~ '$')
       changed_when: false
 
-    - name: check if port TCP is open
+    - name: Check if port TCP is open
       shell:
         cmd: |-
           set -euo pipefail
@@ -30,14 +30,14 @@
       failed_when: __open_ports_output.stdout != "tcp"
       changed_when: false
 
-    - name: check if port is opened in firewall
+    - name: Check if port is opened in firewall
       command: >-
         firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
         {{ nbde_server_port }}/tcp
       register: __firewall_output
       changed_when: false
 
-    - name: check if firewall zone is set
+    - name: Check if firewall zone is set
       shell:
         cmd: |-
           set -euo pipefail
@@ -48,7 +48,7 @@
         __firewall_output_zone.stdout != "{{ nbde_server_firewall_zone }}"
       changed_when: false
 
-    - name: install with default port and firewall zone
+    - name: Install with default port and firewall zone
       include_role:
         name: linux-system-roles.nbde_server
       vars:
@@ -57,7 +57,7 @@
         nbde_server_manage_firewall: true
         nbde_server_manage_selinux: true
 
-    - name: check if port is open
+    - name: Check if port is open
       shell:
         cmd: |-
           set -euo pipefail
@@ -67,7 +67,7 @@
         search(':80$')
       changed_when: false
 
-    - name: check if port TCP is open
+    - name: Check if port TCP is open
       shell:
         cmd: |-
           set -euo pipefail
@@ -76,14 +76,14 @@
       failed_when: __open_ports_output.stdout != "tcp"
       changed_when: false
 
-    - name: check if port is opened in firewall
+    - name: Check if port is opened in firewall
       command: >-
         firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
         80/tcp
       register: __firewall_output
       changed_when: false
 
-    - name: check if firewall zone is set
+    - name: Check if firewall zone is set
       shell:
         cmd: |-
           set -euo pipefail

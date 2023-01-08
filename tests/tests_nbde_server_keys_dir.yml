@@ -14,7 +14,7 @@
           vars:
             nbde_server_fetch_keys: true
 
-        - name: unreachable task
+        - name: Unreachable task
           fail:
             msg: UNREACH
 
@@ -31,7 +31,7 @@
           vars:
             nbde_server_deploy_keys: true
 
-        - name: unreachable task
+        - name: Unreachable task
           fail:
             msg: UNREACH
 
@@ -49,7 +49,7 @@
             nbde_server_fetch_keys: true
             nbde_server_deploy_keys: true
 
-        - name: unreachable task
+        - name: Unreachable task
           fail:
             msg: UNREACH
 
@@ -67,7 +67,7 @@
             nbde_server_fetch_keys: true
             nbde_server_keys_dir: ./foobar
 
-        - name: unreachable task
+        - name: Unreachable task
           fail:
             msg: UNREACH
 
@@ -85,7 +85,7 @@
             nbde_server_fetch_keys: true
             nbde_server_keys_dir: foobar
 
-        - name: unreachable task
+        - name: Unreachable task
           fail:
             msg: UNREACH
 

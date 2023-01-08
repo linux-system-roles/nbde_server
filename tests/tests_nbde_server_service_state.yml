@@ -7,7 +7,7 @@
   hosts: all
 
   tasks:
-    - name: not accepting connections specifying state stopped
+    - name: Not accepting connections specifying state stopped
       import_role:
         name: linux-system-roles.nbde_server
       vars:
@@ -27,7 +27,7 @@
         that: "{{ not item.changed }}"
       loop: "{{ nbde_server_state.results }}"
 
-    - name: accepting connections without specifying state
+    - name: Accepting connections without specifying state
       import_role:
         name: linux-system-roles.nbde_server
 
@@ -45,7 +45,7 @@
         that: "{{ not item.changed }}"
       loop: "{{ nbde_server_state.results }}"
 
-    - name: accepting connections specifying state started
+    - name: Accepting connections specifying state started
       import_role:
         name: linux-system-roles.nbde_server
       vars:
