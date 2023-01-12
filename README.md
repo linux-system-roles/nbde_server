@@ -46,14 +46,14 @@ To use either of these options, you need to specify `nbde_server_keys_dir`, a di
 
 The behavior of using these variables is described next:
 
-#####  When `nbde_server_fetch_keys` is set to `yes`, the role will fetch keys from the hosts in the following manner:
+#####  When `nbde_server_fetch_keys` is set to `true`, the role will fetch keys from the hosts in the following manner:
 - if `nbde_server_deploy_keys` is not set, the keys from every host will be fetched and placed in directories named after the host,
   inside `nbde_server_keys_dir`
 - if `nbde_server_deploy_keys` is set, only the keys from the first host in the inventory will be fetched, and it will be placed in
   the top level directory of `nbde_server_keys_dir`
 
 
-#####  `nbde_server_deploy_keys` is simple: if it is set to yes, it will deploy the keys available in `nbde_server_keys_dir`, in the following manner:
+#####  `nbde_server_deploy_keys` is simple: if it is set to true, it will deploy the keys available in `nbde_server_keys_dir`, in the following manner:
 - the keys located in the top level directory of `nbde_server_keys_dir` will be deployed to every host
 - the keys located within subdirectories named after hosts in the inventory, inside `nbde_server_keys_dir`, will be deployed to that
   specific host

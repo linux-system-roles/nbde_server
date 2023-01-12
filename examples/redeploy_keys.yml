@@ -4,12 +4,11 @@
 # does that, so you can run this playbook after running that other
 # example, to see how it works. Make sure both playbooks use the same
 # nbde_server_keys_dir.
-- hosts: all
-
+- name: Redeploy keys
+  hosts: all
   vars:
     nbde_server_deploy_keys: true
     nbde_server_keys_dir: /root/nbde_server/keys
-
   roles:
     - linux-system-roles.nbde_server
 # vim:set ts=2 sw=2 et:
