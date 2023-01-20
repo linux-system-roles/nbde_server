@@ -1,6 +1,22 @@
 Changelog
 =========
 
+[1.3.1] - 2023-01-20
+--------------------
+
+### New Features
+
+- none
+
+### Bug Fixes
+
+- ansible-lint 6.x fixes (#75)
+
+### Other Changes
+
+- Add check for non-inclusive language (#74)
+- update ignore files for ansible-test 2.14
+
 [1.3.0] - 2022-11-29
 --------------------
 
