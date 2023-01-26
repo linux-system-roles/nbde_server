@@ -1,6 +1,24 @@
 Changelog
 =========
 
+[1.3.2] - 2023-01-26
+--------------------
+
+### New Features
+
+- none
+
+### Bug Fixes
+
+- fix some more Jinja constructs (#83)
+
+These were causing issues on older platforms with older versions
+of Jinja.
+
+### Other Changes
+
+- Create separate github actions for various checks; get rid of monolithic tox.yml (#82)
+
 [1.3.1] - 2023-01-20
 --------------------
 
