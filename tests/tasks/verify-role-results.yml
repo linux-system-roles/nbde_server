@@ -21,7 +21,7 @@
 
 - name: Check services are enabled and started
   assert:
-    that: "{{ not item.changed }}"
+    that: not item.changed
   loop: "{{ nbde_server_services_state.results }}"
 
 - name: Include the appropriate provider verification tasks

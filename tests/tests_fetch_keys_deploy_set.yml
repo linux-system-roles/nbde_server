@@ -56,7 +56,7 @@
 
     - name: Verify the common keys are correct
       assert:
-        that: "{{ item.stat.exists }}"
+        that: item.stat.exists
       loop: "{{ nbde_server_local_common_keys.results }}"
 
     - name: Gather local host keys to verify deploy
@@ -77,7 +77,7 @@
 
     - name: Verify the keys were deployed
       assert:
-        that: "{{ item.stat.exists }}"
+        that: item.stat.exists
       loop: "{{ nbde_server_deployed_keys.results }}"
 
     - name: Gather local common keys to verify deploy
@@ -98,7 +98,7 @@
 
     - name: Verify the common keys were deployed
       assert:
-        that: "{{ item.stat.exists }}"
+        that: item.stat.exists
       loop: "{{ nbde_server_deployed_common_keys.results }}"
 
 # vim:set ts=2 sw=2 et:

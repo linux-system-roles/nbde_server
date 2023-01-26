@@ -24,7 +24,7 @@
 
     - name: Check whether services were enabled but stopped
       assert:
-        that: "{{ not item.changed }}"
+        that: not item.changed
       loop: "{{ nbde_server_state.results }}"
 
     - name: Accepting connections without specifying state
@@ -42,7 +42,7 @@
 
     - name: Check whether services were enabled and started
       assert:
-        that: "{{ not item.changed }}"
+        that: not item.changed
       loop: "{{ nbde_server_state.results }}"
 
     - name: Accepting connections specifying state started
@@ -62,7 +62,7 @@
 
     - name: Check whether services were enabled and started
       assert:
-        that: "{{ not item.changed }}"
+        that: not item.changed
       loop: "{{ nbde_server_state.results }}"
 
 # vim:set ts=2 sw=2 et:
