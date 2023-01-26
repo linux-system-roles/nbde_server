@@ -50,7 +50,7 @@
 
     - name: Verify the common keys are correct
       assert:
-        that: "{{ item.stat.exists }}"
+        that: item.stat.exists
       loop: "{{ nbde_server_local_keys.results }}"
 
 # vim:set ts=2 sw=2 et:
