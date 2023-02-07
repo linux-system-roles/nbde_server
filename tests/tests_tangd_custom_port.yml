@@ -37,17 +37,6 @@
       register: __firewall_output
       changed_when: false
 
-    - name: Check if firewall zone is set
-      shell:
-        cmd: |-
-          set -euo pipefail
-          firewall-cmd --list-all | grep {{ nbde_server_firewall_zone }} | \
-            awk -F' ' '{print $1}'
-      register: __firewall_output_zone
-      failed_when: >-
-        __firewall_output_zone.stdout != nbde_server_firewall_zone
-      changed_when: false
-
     - name: Install with default port and firewall zone
       include_role:
         name: linux-system-roles.nbde_server
@@ -81,17 +70,6 @@
         firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
         80/tcp
       register: __firewall_output
-      changed_when: false
-
-    - name: Check if firewall zone is set
-      shell:
-        cmd: |-
-          set -euo pipefail
-          firewall-cmd --list-all | grep {{ nbde_server_firewall_zone }} | \
-            awk -F' ' '{print $1}'
-      register: __firewall_output_zone
-      failed_when: >-
-        __firewall_output_zone.stdout != nbde_server_firewall_zone
       changed_when: false
 
 # vim:set ts=2 sw=2 et:
