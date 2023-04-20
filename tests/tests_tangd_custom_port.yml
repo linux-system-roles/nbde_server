@@ -37,6 +37,12 @@
       register: __firewall_output
       changed_when: false
 
+    - name: Check for ansible_managed, fingerprint in generated files
+      include_tasks: tasks/check_header.yml
+      vars:
+        __file: /etc/systemd/system/tangd.socket.d/override.conf
+        __fingerprint: "system_role:nbde_server"
+
     - name: Install with default port and firewall zone
       include_role:
         name: linux-system-roles.nbde_server
