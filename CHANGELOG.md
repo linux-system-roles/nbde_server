@@ -1,6 +1,13 @@
 Changelog
 =========
 
+[1.3.7] - 2023-05-30
+--------------------
+
+### Bug Fixes
+
+- fix: README.md headers should not be more than 72 characters
+
 [1.3.6] - 2023-05-26
 --------------------
 
