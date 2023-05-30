@@ -75,7 +75,9 @@ The role will deploy the keys available in `nbde_server_keys_dir`, in the follow
     - linux-system-roles.nbde_server
 ```
 
-### Example 2: lift the keys from every NBDE server install in `/root/nbde_server/keys`
+### Example 2: grab keys from NBDE server installs
+
+Grab the keys from every NBDE server install from /root/nbde_server/keys`
 
 ```yaml
 ---
