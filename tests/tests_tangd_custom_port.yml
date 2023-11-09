@@ -11,6 +11,11 @@
       include_role:
         name: linux-system-roles.nbde_server
 
+    - name: Ensure iproute package for ss command
+      package:
+        name: iproute
+        state: present
+
     - name: Check if port is open
       shell:
         cmd: |-
