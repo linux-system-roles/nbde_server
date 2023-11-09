@@ -1,1 +1,2 @@
 plugins/modules/nbde_server_tang.py validate-modules:missing-gplv3-license
+roles/nbde_server/.ostree/get_ostree_data.sh shebang!skip

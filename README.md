@@ -138,6 +138,10 @@ To redeploy keys, they must be placed into subdirectories named after the host t
     - linux-system-roles.nbde_server
 ```
 
+## rpm-ostree
+
+See README-ostree.md
+
 ## License
 
 MIT
