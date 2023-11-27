@@ -3,6 +3,8 @@
   package:
     name: "{{ __nbde_server_packages }}"
     state: present
+    use: "{{ (__nbde_server_is_ostree | d(false)) |
+             ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
 
 - name: Ensure keys are rotated
   when: nbde_server_rotate_keys | bool
