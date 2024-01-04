@@ -1,5 +1,5 @@
 ---
-- name: Test role variable override
+- name: Test role include variable override
   hosts: all
   gather_facts: true
   tasks:
@@ -26,7 +26,7 @@
         versions:
           - "{{ facts['distribution_version'] }}"
           - "{{ facts['distribution_major_version'] }}"
-        separators: ["-", _]
+        separators: ["-", "_"]
         # create all variants like CentOS, CentOS_8.1, CentOS-8.1,
         # CentOS-8, CentOS-8.1
         # more formally:
@@ -38,6 +38,7 @@
         varfiles: "{{ [facts['distribution']] | product(separators) |
           map('join') | product(versions) | map('join') | list +
           [facts['distribution'], facts['os_family']] }}"
+      register: __varfiles_created
 
     - name: Include role
       include_role:
@@ -46,6 +47,14 @@
       vars:
         roletoinclude: linux-system-roles.nbde_server
 
-    - name: Cleanup
+    - name: Cleanup role files
       tags: tests::cleanup
       include_tasks: tasks/cleanup.yml
+
+    - name: Cleanup test files
+      file:
+        path: "{{ item.dest }}"
+        state: absent
+      loop: "{{ __varfiles_created.results }}"
+      delegate_to: localhost
+      when: inventory_hostname == ansible_play_hosts_all[0]
