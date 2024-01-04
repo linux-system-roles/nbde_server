@@ -23,8 +23,6 @@ module: nbde_server_tang
 
 short_description: Handle key management operations in a tang server.
 
-version_added: "2.5"
-
 description:
     - "WARNING: Do not use this module directly! It is only for role internal use."
     - "This module performs operations such as key management -- i.e.
@@ -320,8 +318,8 @@ def run_module():
     """The entry point of the module."""
 
     module_args = dict(
-        keygen=dict(type="str", required=False),
-        keydir=dict(type="str", required=False),
+        keygen=dict(type="str", required=False, no_log=False),
+        keydir=dict(type="str", required=False, no_log=False),
         cachedir=dict(type="str", required=False),
         update=dict(type="str", required=False),
         force=dict(type="bool", required=False, default=False),
@@ -330,7 +328,7 @@ def run_module():
             required=False,
             choices=["keys-rotated", "keys-created", "keys-deployed", "cache-updated"],
         ),
-        keys_to_deploy_dir=dict(type="str", required=False),
+        keys_to_deploy_dir=dict(type="str", required=False, no_log=False),
     )
 
     result = dict(changed=False)
