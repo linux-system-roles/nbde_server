@@ -39,8 +39,13 @@
           map('join') | product(versions) | map('join') | list +
           [facts['distribution'], facts['os_family']] }}"
 
-    - name: Import role
-      import_role:
+    - name: Include role
+      include_role:
         name: caller
+        public: true
       vars:
         roletoinclude: linux-system-roles.nbde_server
+
+    - name: Cleanup
+      tags: tests::cleanup
+      include_tasks: tasks/cleanup.yml

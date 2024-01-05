@@ -2,10 +2,19 @@
 - name: Ensure that the role runs with default parameters
   hosts: all
   gather_facts: false
-  roles:
-    - linux-system-roles.nbde_server
   tasks:
-    - name: Verify role results
-      include_tasks: tasks/verify-role-results.yml
+    - name: Run test
+      block:
+        - name: Run role
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
+
+        - name: Verify role results
+          include_tasks: tasks/verify-role-results.yml
+      always:
+        - name: Cleanup
+          tags: tests::cleanup
+          include_tasks: tasks/cleanup.yml
 
 # vim:set ts=2 sw=2 et:

@@ -15,90 +15,100 @@
 
 - name: Test nbde_server_fetch_keys with nbde_server_deploy_keys set
   hosts: all
-
-  vars:
-    nbde_server_keys_dir: /tmp/.nbde_server_keys_dir
-
   tasks:
-    - name: Ensure we have keys
-      import_role:
-        name: linux-system-roles.nbde_server
+    - name: Run tests
+      block:
+        - name: Create tmpdir for server keys
+          tempfile:
+            state: directory
+            prefix: nbde_server_fetch_keys_deploy_set
+          register: __tmpdir
+          delegate_to: localhost
 
-    - name: Gather common keys, from the first host in the inventory
-      run_once: true
-      find:
-        paths: "{{ __nbde_server_keydir }}"
-        hidden: true
-        patterns:
-          - "*.jwk"
-          - ".*.jwk"
-      register: nbde_server_host_common_keys
+        - name: Set nbde_server_keys_dir
+          set_fact:
+            nbde_server_keys_dir: "{{ __tmpdir.path }}"
 
-    - name: Clean up nbde_server_keys_dir
-      file:
-        path: "{{ nbde_server_keys_dir }}"
-        state: absent
+        - name: Ensure we have keys
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
 
-    - name: Run with nbde_server_deploy_keys set to check the common keys
-      import_role:
-        name: linux-system-roles.nbde_server
-      vars:
-        nbde_server_rotate_keys: false
-        nbde_server_fetch_keys: true
-        nbde_server_deploy_keys: true
+        - name: Gather common keys, from the first host in the inventory
+          run_once: true
+          find:
+            paths: "{{ __nbde_server_keydir }}"
+            hidden: true
+            patterns:
+              - "*.jwk"
+              - ".*.jwk"
+          register: nbde_server_host_common_keys
 
-    - name: Check whether the common keys were properly fetched
-      stat:
-        path: "{{ nbde_server_keys_dir }}/{{ item.path | basename }}"
-      loop: "{{ nbde_server_host_common_keys.files }}"
-      delegate_to: localhost
-      register: nbde_server_local_common_keys
+        - name: Run with nbde_server_deploy_keys set to check the common keys
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
+          vars:
+            nbde_server_rotate_keys: false
+            nbde_server_fetch_keys: true
+            nbde_server_deploy_keys: true
 
-    - name: Verify the common keys are correct
-      assert:
-        that: item.stat.exists
-      loop: "{{ nbde_server_local_common_keys.results }}"
+        - name: Check whether the common keys were properly fetched
+          stat:
+            path: "{{ nbde_server_keys_dir }}/{{ item.path | basename }}"
+          loop: "{{ nbde_server_host_common_keys.files }}"
+          delegate_to: localhost
+          register: nbde_server_local_common_keys
 
-    - name: Gather local host keys to verify deploy
-      find:
-        paths: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
-        hidden: true
-        patterns:
-          - "*.jwk"
-          - ".*.jwk"
-      delegate_to: localhost
-      register: nbde_server_local_host_keys
+        - name: Verify the common keys are correct
+          assert:
+            that: item.stat.exists
+          loop: "{{ nbde_server_local_common_keys.results }}"
 
-    - name: Check whether the host keys were properly deployed
-      stat:
-        path: "{{ __nbde_server_keydir }}/{{ item.path | basename }}"
-      loop: "{{ nbde_server_local_host_keys.files }}"
-      register: nbde_server_deployed_keys
+        - name: Gather local host keys to verify deploy
+          find:
+            paths: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}"
+            hidden: true
+            patterns:
+              - "*.jwk"
+              - ".*.jwk"
+          delegate_to: localhost
+          register: nbde_server_local_host_keys
 
-    - name: Verify the keys were deployed
-      assert:
-        that: item.stat.exists
-      loop: "{{ nbde_server_deployed_keys.results }}"
+        - name: Check whether the host keys were properly deployed
+          stat:
+            path: "{{ __nbde_server_keydir }}/{{ item.path | basename }}"
+          loop: "{{ nbde_server_local_host_keys.files }}"
+          register: nbde_server_deployed_keys
 
-    - name: Gather local common keys to verify deploy
-      find:
-        paths: "{{ nbde_server_keys_dir }}"
-        hidden: true
-        patterns:
-          - "*.jwk"
-          - ".*.jwk"
-      delegate_to: localhost
-      register: nbde_server_local_common_keys
+        - name: Verify the keys were deployed
+          assert:
+            that: item.stat.exists
+          loop: "{{ nbde_server_deployed_keys.results }}"
 
-    - name: Check whether the local common keys were properly deployed
-      stat:
-        path: "{{ __nbde_server_keydir }}/{{ item.path | basename }}"
-      loop: "{{ nbde_server_local_common_keys.files }}"
-      register: nbde_server_deployed_common_keys
+        - name: Gather local common keys to verify deploy
+          find:
+            paths: "{{ nbde_server_keys_dir }}"
+            hidden: true
+            patterns:
+              - "*.jwk"
+              - ".*.jwk"
+          delegate_to: localhost
+          register: nbde_server_local_common_keys
 
-    - name: Verify the common keys were deployed
-      assert:
-        that: item.stat.exists
-      loop: "{{ nbde_server_deployed_common_keys.results }}"
+        - name: Check whether the local common keys were properly deployed
+          stat:
+            path: "{{ __nbde_server_keydir }}/{{ item.path | basename }}"
+          loop: "{{ nbde_server_local_common_keys.files }}"
+          register: nbde_server_deployed_common_keys
+
+        - name: Verify the common keys were deployed
+          assert:
+            that: item.stat.exists
+          loop: "{{ nbde_server_deployed_common_keys.results }}"
+      always:
+        - name: Cleanup
+          tags: tests::cleanup
+          include_tasks: tasks/cleanup.yml
 
 # vim:set ts=2 sw=2 et:

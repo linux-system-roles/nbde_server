@@ -10,47 +10,57 @@
 
 - name: Test nbde_server_fetch_keys with nbde_server_deploy_keys not set
   hosts: all
-
-  vars:
-    nbde_server_keys_dir: /tmp/.nbde_server_keys_dir
-
   tasks:
-    - name: Ensure we have keys
-      import_role:
-        name: linux-system-roles.nbde_server
+    - name: Run tests
+      block:
+        - name: Create tmpdir for server keys
+          tempfile:
+            state: directory
+            prefix: nbde_server_fetch_keys_deploy_not_set
+          register: __tmpdir
+          delegate_to: localhost
 
-    - name: Gather keys
-      find:
-        paths: "{{ __nbde_server_keydir }}"
-        hidden: true
-        patterns:
-          - "*.jwk"
-          - ".*.jwk"
-      register: nbde_server_host_keys
+        - name: Set nbde_server_keys_dir
+          set_fact:
+            nbde_server_keys_dir: "{{ __tmpdir.path }}"
 
-    - name: Clean up nbde_server_keys_dir
-      file:
-        path: "{{ nbde_server_keys_dir }}"
-        state: absent
+        - name: Ensure we have keys
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
 
-    - name: Run with nbde_server_deploy_keys not set to check the keys
-      import_role:
-        name: linux-system-roles.nbde_server
-      vars:
-        nbde_server_rotate_keys: false
-        nbde_server_fetch_keys: true
-        nbde_server_deploy_keys: false
+        - name: Gather keys
+          find:
+            paths: "{{ __nbde_server_keydir }}"
+            hidden: true
+            patterns:
+              - "*.jwk"
+              - ".*.jwk"
+          register: nbde_server_host_keys
 
-    - name: Check whether the keys were properly fetched
-      stat:
-        path: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}/{{ item.path | basename }}"  # yamllint disable-line rule:line-length
-      loop: "{{ nbde_server_host_keys.files }}"
-      delegate_to: localhost
-      register: nbde_server_local_keys
+        - name: Run with nbde_server_deploy_keys not set to check the keys
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
+          vars:
+            nbde_server_rotate_keys: false
+            nbde_server_fetch_keys: true
+            nbde_server_deploy_keys: false
 
-    - name: Verify the common keys are correct
-      assert:
-        that: item.stat.exists
-      loop: "{{ nbde_server_local_keys.results }}"
+        - name: Check whether the keys were properly fetched
+          stat:
+            path: "{{ nbde_server_keys_dir }}/{{ inventory_hostname }}/{{ item.path | basename }}"  # yamllint disable-line rule:line-length
+          loop: "{{ nbde_server_host_keys.files }}"
+          delegate_to: localhost
+          register: nbde_server_local_keys
+
+        - name: Verify the common keys are correct
+          assert:
+            that: item.stat.exists
+          loop: "{{ nbde_server_local_keys.results }}"
+      always:
+        - name: Cleanup
+          tags: tests::cleanup
+          include_tasks: tasks/cleanup.yml
 
 # vim:set ts=2 sw=2 et:
