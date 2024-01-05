@@ -1,0 +1,25 @@
+---
+- name: Remove control node files/directories
+  file:
+    path: "{{ nbde_server_keys_dir }}"
+    state: absent
+  when: nbde_server_keys_dir | d("") is match("^/")
+  delegate_to: localhost
+
+- name: Remove managed node files/directories
+  shell: |
+    set -euxo pipefail
+    if [ "{{ item.remove_dir }}" = true ]; then
+      rm -rf "{{ item.path }}"
+    else
+      rm -rf "{{ item.path }}"/* "{{ item.path }}"/.* || :
+    fi
+  changed_when: true
+  loop:
+    - path: "{{ nbde_server_keys_dir | d('') }}"
+      remove_dir: "true"
+    - path: "{{ __nbde_server_keydir | d('') }}"
+      remove_dir: "false"
+    - path: "{{ __nbde_server_cachedir | d('') }}"
+      remove_dir: "false"
+  when: item.path is match("^/")

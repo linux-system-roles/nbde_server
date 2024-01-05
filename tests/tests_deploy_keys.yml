@@ -6,56 +6,66 @@
 
 - name: Test nbde_server_deploy_keys
   hosts: all
-
-  vars:
-    nbde_server_keys_dir: /tmp/.nbde_server_keys_dir
-
   tasks:
-    - name: Ensure we have keys
-      import_role:
-        name: linux-system-roles.nbde_server
+    - name: Run tests
+      block:
+        - name: Create tmpdir for server keys
+          tempfile:
+            state: directory
+            prefix: nbde_server_deploy_keys
+          register: __tmpdir
+          delegate_to: localhost
 
-    - name: Clean up nbde_server_keys_dir
-      file:
-        path: "{{ nbde_server_keys_dir }}"
-        state: absent
+        - name: Set nbde_server_keys_dir
+          set_fact:
+            nbde_server_keys_dir: "{{ __tmpdir.path }}"
 
-    - name: Fetch the keys from every host
-      import_role:
-        name: linux-system-roles.nbde_server
-      vars:
-        nbde_server_fetch_keys: true
-        nbde_server_deploy_keys: false
+        - name: Ensure we have keys
+          include_role:
+            name: linux-system-roles.nbde_server
 
-    - name: Gather keys before redeploy
-      find:
-        paths: "{{ __nbde_server_keydir }}"
-        hidden: true
-        patterns:
-          - "*.jwk"
-          - ".*.jwk"
-      register: nbde_server_keys_before_redeploy
+        - name: Fetch the keys from every host
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
+          vars:
+            nbde_server_fetch_keys: true
+            nbde_server_deploy_keys: false
 
-    - name: Redeploy these same keys
-      import_role:
-        name: linux-system-roles.nbde_server
-      vars:
-        nbde_server_fetch_keys: false
-        nbde_server_deploy_keys: true
+        - name: Gather keys before redeploy
+          find:
+            paths: "{{ __nbde_server_keydir }}"
+            hidden: true
+            patterns:
+              - "*.jwk"
+              - ".*.jwk"
+          register: nbde_server_keys_before_redeploy
 
-    - name: Gather keys after redeploy
-      find:
-        paths: "{{ __nbde_server_keydir }}"
-        hidden: true
-        patterns:
-          - "*.jwk"
-          - ".*.jwk"
-      register: nbde_server_keys_after_redeploy
+        - name: Redeploy these same keys
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
+          vars:
+            nbde_server_fetch_keys: false
+            nbde_server_deploy_keys: true
 
-    - name: Verify the keys are the same
-      assert:
-        that: >
-          nbde_server_keys_before_redeploy.files
-          == nbde_server_keys_after_redeploy.files
+        - name: Gather keys after redeploy
+          find:
+            paths: "{{ __nbde_server_keydir }}"
+            hidden: true
+            patterns:
+              - "*.jwk"
+              - ".*.jwk"
+          register: nbde_server_keys_after_redeploy
+
+        - name: Verify the keys are the same
+          assert:
+            that: >
+              nbde_server_keys_before_redeploy.files
+              == nbde_server_keys_after_redeploy.files
+      always:
+        - name: Cleanup
+          tags: tests::cleanup
+          include_tasks: tasks/cleanup.yml
 
 # vim:set ts=2 sw=2 et:

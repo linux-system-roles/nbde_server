@@ -7,62 +7,71 @@
   hosts: all
 
   tasks:
-    - name: Not accepting connections specifying state stopped
-      import_role:
-        name: linux-system-roles.nbde_server
-      vars:
-        nbde_server_service_state: stopped
+    - name: Run tests
+      block:
+        - name: Accepting connections without specifying state
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
 
-    - name: Gather state of services
-      service:
-        name: "{{ item }}"
-        enabled: true
-        state: stopped
-      register: nbde_server_state
-      check_mode: true
-      loop: "{{ __nbde_server_services }}"
+        - name: Gather state of services
+          service:
+            name: "{{ item }}"
+            enabled: true
+            state: started
+          register: nbde_server_state
+          check_mode: true
+          loop: "{{ __nbde_server_services }}"
 
-    - name: Check whether services were enabled but stopped
-      assert:
-        that: not item.changed
-      loop: "{{ nbde_server_state.results }}"
+        - name: Check whether services were enabled and started
+          assert:
+            that: not item.changed
+          loop: "{{ nbde_server_state.results }}"
 
-    - name: Accepting connections without specifying state
-      import_role:
-        name: linux-system-roles.nbde_server
+        - name: Not accepting connections specifying state stopped
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
+          vars:
+            nbde_server_service_state: stopped
 
-    - name: Gather state of services
-      service:
-        name: "{{ item }}"
-        enabled: true
-        state: started
-      register: nbde_server_state
-      check_mode: true
-      loop: "{{ __nbde_server_services }}"
+        - name: Gather state of services
+          service:
+            name: "{{ item }}"
+            enabled: true
+            state: stopped
+          register: nbde_server_state
+          check_mode: true
+          loop: "{{ __nbde_server_services }}"
 
-    - name: Check whether services were enabled and started
-      assert:
-        that: not item.changed
-      loop: "{{ nbde_server_state.results }}"
+        - name: Check whether services were enabled but stopped
+          assert:
+            that: not item.changed
+          loop: "{{ nbde_server_state.results }}"
 
-    - name: Accepting connections specifying state started
-      import_role:
-        name: linux-system-roles.nbde_server
-      vars:
-        nbde_server_service_state: started
+        - name: Accepting connections specifying state started
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true
+          vars:
+            nbde_server_service_state: started
 
-    - name: Gather state of services
-      service:
-        name: "{{ item }}"
-        enabled: true
-        state: started
-      register: nbde_server_state
-      check_mode: true
-      loop: "{{ __nbde_server_services }}"
+        - name: Gather state of services
+          service:
+            name: "{{ item }}"
+            enabled: true
+            state: started
+          register: nbde_server_state
+          check_mode: true
+          loop: "{{ __nbde_server_services }}"
 
-    - name: Check whether services were enabled and started
-      assert:
-        that: not item.changed
-      loop: "{{ nbde_server_state.results }}"
+        - name: Check whether services were enabled and started
+          assert:
+            that: not item.changed
+          loop: "{{ nbde_server_state.results }}"
+      always:
+        - name: Cleanup
+          tags: tests::cleanup
+          include_tasks: tasks/cleanup.yml
 
 # vim:set ts=2 sw=2 et:
