@@ -1,0 +1,108 @@
+---
+- name: >-
+    Ensure that the role can share tangd.socket.d directory with other
+    files
+  hosts: all
+  gather_facts: false
+  vars:
+    maxcon_conf: /etc/systemd/system/tangd.socket.d/override2.conf
+    tangd_dir_mode: "0775"
+    tangd_file_mode: "0664"
+  tasks:
+    - name: Run test
+      block:
+        - name: Create the tangd.socket.d directory
+          file:
+            path: /etc/systemd/system/tangd.socket.d
+            state: directory
+            mode: "{{ tangd_dir_mode }}"
+
+        - name: Create a customization systemd file
+          copy:
+            content: |
+              [Socket]
+              MaxConnections=128
+            dest: "{{ maxcon_conf }}"
+            mode: "{{ tangd_file_mode }}"
+
+        - name: Run role
+          include_role:
+            name: linux-system-roles.nbde_server
+            public: true  # only need this the first time to get private vars
+
+        - name: Check tangd socket dir
+          stat:
+            path: "{{ __nbde_server_tangd_socket_dir }}"
+          register: __stat
+          failed_when: not __stat.stat.exists or
+            __stat.stat.mode != tangd_dir_mode
+
+        - name: Check custom file
+          stat:
+            path: "{{ maxcon_conf }}"
+          register: __stat
+          failed_when: not __stat.stat.exists or
+            __stat.stat.mode != tangd_file_mode
+
+        - name: Verify role reported no changes
+          assert:
+            that: not __nbde_server_custom_dir is changed
+
+        - name: Run the role with a custom port
+          include_role:
+            name: linux-system-roles.nbde_server
+          vars:
+            nbde_server_port: 7500
+            nbde_server_firewall_zone: public
+            nbde_server_manage_firewall: true
+            nbde_server_manage_selinux: true
+
+        - name: Check tangd socket dir
+          stat:
+            path: "{{ __nbde_server_tangd_socket_dir }}"
+          register: __stat
+          failed_when: not __stat.stat.exists or
+            __stat.stat.mode != tangd_dir_mode
+
+        - name: Check custom file
+          stat:
+            path: "{{ maxcon_conf }}"
+          register: __stat
+          failed_when: not __stat.stat.exists or
+            __stat.stat.mode != tangd_file_mode
+
+        - name: Verify role reported no changes
+          assert:
+            that: not __nbde_server_custom_dir is changed
+
+        - name: Check for ansible_managed, fingerprint in generated files
+          include_tasks: tasks/check_header.yml
+          vars:
+            __file: "{{ __nbde_server_tangd_socket_file_path }}"
+            __fingerprint: "system_role:nbde_server"
+
+        - name: Remove custom file
+          file:
+            path: "{{ maxcon_conf }}"
+            state: absent
+
+        - name: Run the role with default port
+          include_role:
+            name: linux-system-roles.nbde_server
+
+        - name: Check tangd socket dir is absent
+          stat:
+            path: "{{ __nbde_server_tangd_socket_dir }}"
+          register: __stat
+          failed_when: __stat.stat.exists
+
+      always:
+        - name: Debug
+          command: journalctl -ex
+          changed_when: false
+
+        - name: Cleanup
+          tags: tests::cleanup
+          include_tasks: tasks/cleanup.yml
+
+# vim:set ts=2 sw=2 et:

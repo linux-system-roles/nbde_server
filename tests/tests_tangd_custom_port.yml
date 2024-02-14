@@ -52,7 +52,7 @@
         - name: Check for ansible_managed, fingerprint in generated files
           include_tasks: tasks/check_header.yml
           vars:
-            __file: /etc/systemd/system/tangd.socket.d/override.conf
+            __file: "{{ __nbde_server_tangd_socket_file_path }}"
             __fingerprint: "system_role:nbde_server"
 
         - name: Install with default port and firewall zone
