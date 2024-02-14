@@ -1,5 +1,10 @@
 # SPDX-License-Identifier: MIT
 ---
+__nbde_server_tangd_socket_dir: /etc/systemd/system/tangd.socket.d
+__nbde_server_tangd_socket_file_name: override.conf
+__nbde_server_tangd_socket_file_path: "{{
+  __nbde_server_tangd_socket_dir}}/{{ __nbde_server_tangd_socket_file_name }}"
+
 # ansible_facts required by the role
 __nbde_server_required_facts:
   - distribution
