@@ -1,6 +1,18 @@
 Changelog
 =========
 
+[1.4.3] - 2024-02-14
+--------------------
+
+### Bug Fixes
+
+- fix: Allow tangd socket override directory to be managed outside of the role (#139)
+
+### Other Changes
+
+- ci: Bump codecov/codecov-action from 3 to 4 (#136)
+- ci: fix python unit test - copy pytest config to tests/unit (#137)
+
 [1.4.2] - 2024-01-16
 --------------------
 
