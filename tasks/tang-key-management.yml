@@ -88,7 +88,7 @@
         dest: "{{ nbde_server_tempdir.path }}/"
         owner: "{{ __nbde_server_user }}"
         group: "{{ __nbde_server_group }}"
-        mode: 0400
+        mode: "0400"
       loop: "{{ nbde_server_common_keys.files }}"
 
     # This task gathers the specific keys fills up a nbde_server_host_keys
@@ -111,7 +111,7 @@
         dest: "{{ nbde_server_tempdir.path }}/"
         owner: "{{ __nbde_server_user }}"
         group: "{{ __nbde_server_group }}"
-        mode: 0400
+        mode: "0400"
       loop: "{{ nbde_server_host_keys.files }}"
 
     # This tasks perform the actual deploy. The keys are in available in
