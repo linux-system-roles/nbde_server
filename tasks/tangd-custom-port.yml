@@ -1,6 +1,6 @@
 ---
 - name: Ensure tang port is labeled tangd_port_t for SELinux
-  import_role:
+  include_role:
     name: fedora.linux_system_roles.selinux
   vars:
     selinux_ports:
@@ -59,7 +59,7 @@
       __nbde_server_custom_file is changed }}"
 
 - name: Ensure the desired port is added to firewalld
-  import_role:
+  include_role:
     name: fedora.linux_system_roles.firewall
   vars:
     firewall:
