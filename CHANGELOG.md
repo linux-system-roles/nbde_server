@@ -1,6 +1,19 @@
 Changelog
 =========
 
+[1.4.7] - 2024-08-01
+--------------------
+
+### Bug Fixes
+
+- fix: Remove hard dependency on selinux and firewall roles (#154)
+
+### Other Changes
+
+- ci: Add tft plan and workflow (#152)
+- ci: Update fmf plan to add a separate job to prepare managed nodes (#155)
+- ci: Bump sclorg/testing-farm-as-github-action from 2 to 3 (#156)
+
 [1.4.6] - 2024-07-02
 --------------------
 
