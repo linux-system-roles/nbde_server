@@ -59,7 +59,7 @@ SOFTWARE.
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -70,7 +70,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -205,14 +205,14 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="
 <p>These are the variables that can be passed to the role:</p>
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th><strong>Variable</strong></th>
 <th><strong>Default</strong></th>
 <th><strong>Description</strong></th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>nbde_server_provider</code></td>
 <td><code>tang</code></td>
 <td>identifies the provider for <code>nbde_server</code> role. We
@@ -220,7 +220,7 @@ currently support <code>tang</code> as an <code>nbde_server</code>
 provider, meaning that the <code>nbde_server</code> role is currently
 able to provision/deploy tang servers.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>nbde_server_service_state</code></td>
 <td><code>started</code></td>
 <td>indicates the state the nbde_server should be. It can be either
@@ -228,7 +228,7 @@ able to provision/deploy tang servers.</td>
 <code>started</code> means the server is accepting connections, whereas
 <code>stopped</code> means it is not accepting connections.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>nbde_server_rotate_keys</code></td>
 <td><code>false</code></td>
 <td>indicates whether we should rotate existing keys -- if any -- , then
@@ -237,7 +237,7 @@ keys, if there are none, and don't touch the keys, if they exist. If set
 to <code>true</code>, existing keys will be rotated and new keys will be
 created.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>nbde_server_fetch_keys</code></td>
 <td><code>false</code></td>
 <td>indicates whether we should fetch keys to the control node, in which
@@ -245,7 +245,7 @@ case they will be placed in <code>nbde_server_keys_dir</code>. You
 <strong>must</strong> set <code>nbde_server_keys_dir</code> to use
 <code>nbde_server_fetch_keys</code>.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>nbde_server_deploy_keys</code></td>
 <td><code>false</code></td>
 <td>indicates whether we should deploy the keys located in
@@ -253,7 +253,7 @@ case they will be placed in <code>nbde_server_keys_dir</code>. You
 <strong>must</strong> set <code>nbde_server_keys_dir</code> to use
 <code>nbde_server_deploy_keys</code>.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>nbde_server_keys_dir</code></td>
 <td></td>
 <td>specifies a directory in the control node that contains keys to be
@@ -266,19 +266,19 @@ path. You need to set this to use either
 <code>nbde_server_fetch_keys</code> and/or
 <code>nbde_server_deploy_keys</code>.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>nbde_server_manage_firewall</code></td>
 <td><code>false</code></td>
 <td>manage the nbde server port and zone using the <code>firewall</code>
 role if set to <code>true</code>.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>nbde_server_manage_selinux</code></td>
 <td><code>false</code></td>
 <td>manage the nbde server port using the <code>selinux</code> role if
 set to <code>true</code>.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>nbde_server_port</code></td>
 <td><code>80</code></td>
 <td>port number that tangd will listen on. You <strong>must</strong> set
@@ -287,7 +287,7 @@ manage SELinux labeling for the port. You <strong>must</strong> set
 <code>nbde_server_manage_firewall: true</code> if you want the role to
 manage firewall for the port.</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>nbde_server_firewall_zone</code></td>
 <td><code>public</code></td>
 <td>change the default zone where the port should be opened. You
