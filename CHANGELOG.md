@@ -1,6 +1,18 @@
 Changelog
 =========
 
+[1.4.8] - 2024-10-30
+--------------------
+
+### Other Changes
+
+- ci: Add workflow for ci_test bad, use remote fmf plan (#158)
+- ci: Fix missing slash in ARTIFACTS_URL (#159)
+- ci: Add tags to TF workflow, allow more [citest bad] formats (#160)
+- ci: ansible-test action now requires ansible-core version (#161)
+- ci: add YAML header to github action workflow files (#162)
+- refactor: Use vars/RedHat_N.yml symlink for CentOS, Rocky, Alma wherever possible (#164)
+
 [1.4.7] - 2024-08-01
 --------------------
 
