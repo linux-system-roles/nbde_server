@@ -36,7 +36,9 @@
 - name: Reload the daemons so the new changes take effect
   systemd:
     daemon_reload: true
-  when: __nbde_server_port_changed | d(false) | bool
+  when:
+    - __nbde_server_port_changed | d(false) | bool
+    - __nbde_server_is_booted | bool
 
 - name: Ensure required services are enabled and at the right state
   service:
@@ -45,8 +47,8 @@
     enabled: true
   loop: "{{ __nbde_server_services }}"
   vars:
-    __state: "{{ nbde_server_service_state if
-      nbde_server_service_state != 'started' else
+    __state: "{{ omit if not __nbde_server_is_booted else
+      nbde_server_service_state if nbde_server_service_state != 'started' else
       'restarted' if __nbde_server_port_changed else
       'started' }}"
 
