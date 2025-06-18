@@ -20,7 +20,7 @@ See below
 The role requires additional collections which are specified in `meta/collection-requirements.yml`.  These are not automatically installed.  You must install them like this:
 
 ```bash
-ansible-galaxy install -vv -r meta/collection-requirements.yml`
+ansible-galaxy install -vv -r meta/collection-requirements.yml
 ```
 
 ## Role Variables
