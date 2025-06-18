@@ -16,7 +16,7 @@
   service:
     name: "{{ item }}"
     enabled: true
-    state: started
+    state: "{{ 'started' if __nbde_server_is_booted else omit }}"
   check_mode: true
   register: nbde_server_services_state
   loop: "{{ __nbde_server_services }}"

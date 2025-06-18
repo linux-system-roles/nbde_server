@@ -18,7 +18,7 @@
           service:
             name: "{{ item }}"
             enabled: true
-            state: started
+            state: "{{ 'started' if __nbde_server_is_booted else omit }}"
           register: nbde_server_state
           check_mode: true
           loop: "{{ __nbde_server_services }}"
@@ -39,7 +39,7 @@
           service:
             name: "{{ item }}"
             enabled: true
-            state: stopped
+            state: "{{ 'stopped' if __nbde_server_is_booted else omit }}"
           register: nbde_server_state
           check_mode: true
           loop: "{{ __nbde_server_services }}"
@@ -60,7 +60,7 @@
           service:
             name: "{{ item }}"
             enabled: true
-            state: started
+            state: "{{ 'started' if __nbde_server_is_booted else omit }}"
           register: nbde_server_state
           check_mode: true
           loop: "{{ __nbde_server_services }}"

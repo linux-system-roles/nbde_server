@@ -18,6 +18,7 @@ galaxy_info:
   galaxy_tags:
     - centos
     - clevis
+    - containerbuild
     - el7
     - el8
     - el9

@@ -13,6 +13,15 @@
           include_role:
             name: linux-system-roles.nbde_server
             public: true
+          when: not __bootc_validation | d(false)
+
+        # role does not run during bootc QEMU validation, thus some vars are undefined
+        - name: Set __nbde_server_is_booted for bootc validation tests
+          set_fact:
+            __nbde_server_is_booted: true
+            # see vars/main.yml
+            __nbde_server_tangd_socket_file_path: /etc/systemd/system/tangd.socket.d/override.conf
+          when: __bootc_validation | d(false)
 
         - name: Ensure iproute package for ss command
           package:
@@ -20,6 +29,13 @@
             state: present
             use: "{{ (__nbde_server_is_ostree | d(false)) |
                     ternary('ansible.posix.rhel_rpm_ostree', omit) }}"
+          when: not __bootc_validation | d(false)
+
+        - name: Create QEMU deployment during bootc end-to-end test
+          delegate_to: localhost
+          command: "{{ lsr_scriptdir }}/bootc-buildah-qcow.sh {{ ansible_host }}"
+          changed_when: true
+          when: ansible_connection == "buildah"
 
         - name: Check if port is open
           shell:
@@ -31,6 +47,7 @@
           failed_when: not __open_ports_output.stdout is
             search(':' ~ (nbde_server_port | string) ~ '$')
           changed_when: false
+          when: __nbde_server_is_booted | bool
 
         - name: Check if port TCP is open
           shell:
@@ -41,10 +58,11 @@
           register: __open_ports_output
           failed_when: __open_ports_output.stdout != "tcp"
           changed_when: false
+          when: __nbde_server_is_booted | bool
 
         - name: Check if port is opened in firewall
           command: >-
-            firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
+            firewall-offline-cmd --zone {{ nbde_server_firewall_zone }} --query-port
             {{ nbde_server_port }}/tcp
           register: __firewall_output
           changed_when: false
@@ -54,6 +72,12 @@
           vars:
             __file: "{{ __nbde_server_tangd_socket_file_path }}"
             __fingerprint: "system_role:nbde_server"
+
+        # do just one image/verify cycle for the bootc end-to-end test
+        - name: Skip remaining steps in bootc end-to-end validation
+          meta: end_play
+          when: __bootc_validation | d(false)
+
 
         - name: Install with default port and firewall zone
           include_role:
@@ -74,6 +98,7 @@
           failed_when: not __open_ports_output.stdout is
             search(':80$')
           changed_when: false
+          when: __nbde_server_is_booted | bool
 
         - name: Check if port TCP is open
           shell:
@@ -83,10 +108,11 @@
           register: __open_ports_output
           failed_when: __open_ports_output.stdout != "tcp"
           changed_when: false
+          when: __nbde_server_is_booted | bool
 
         - name: Check if port is opened in firewall
           command: >-
-            firewall-cmd --zone {{ nbde_server_firewall_zone }} --query-port
+            firewall-offline-cmd --zone {{ nbde_server_firewall_zone }} --query-port
             80/tcp
           register: __firewall_output
           changed_when: false

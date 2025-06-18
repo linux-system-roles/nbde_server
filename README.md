@@ -30,7 +30,7 @@ These are the variables that can be passed to the role:
 | **Variable** | **Default** | **Description** |
 |----------|-------------|------|
 | `nbde_server_provider` | `tang` | identifies the provider for `nbde_server` role. We currently support `tang` as an `nbde_server` provider, meaning that the `nbde_server` role is currently able to provision/deploy tang servers.
-| `nbde_server_service_state` | `started` | indicates the state the nbde_server should be. It can be either `started` (default) or `stopped`. `started` means the server is accepting connections, whereas `stopped` means it is not accepting connections.
+| `nbde_server_service_state` | `started` | indicates the state the nbde_server should be. It can be either `started` (default) or `stopped`. `started` means the server is accepting connections, whereas `stopped` means it is not accepting connections. Ignored for non-booted hosts like container builds, then the service is always started at boot.
 | `nbde_server_rotate_keys`| `false` | indicates whether we should rotate existing keys -- if any -- , then create new keys. Default behavior (`false`) is to create new keys, if there are none, and don't touch the keys, if they exist. If set to `true`, existing keys will be rotated and new keys will be created.
 |`nbde_server_fetch_keys`| `false` | indicates whether we should fetch keys to the control node, in which case they will be placed in `nbde_server_keys_dir`. You **must** set `nbde_server_keys_dir` to use `nbde_server_fetch_keys`.
 |`nbde_server_deploy_keys`| `false` |indicates whether we should deploy the keys located in `nbde_server_keys_dir` directory to the remote hosts. You **must** set `nbde_server_keys_dir` to use `nbde_server_deploy_keys`.
