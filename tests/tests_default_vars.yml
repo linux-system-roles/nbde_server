@@ -8,16 +8,20 @@
           include_role:
             name: linux-system-roles.nbde_server
             public: true
+
         - name: Assert that the role declares all parameters in defaults
           assert:
-            that: "{{ item }} is defined"
-          loop:
-            - nbde_server_provider
-            - nbde_server_deploy_keys
-            - nbde_server_fetch_keys
-            - nbde_server_rotate_keys
-            - nbde_server_keys_dir
+            that: nbde_server_vars | length == nbde_server_vars_vals | length
+          vars:
+            nbde_server_vars:
+              - nbde_server_provider
+              - nbde_server_deploy_keys
+              - nbde_server_fetch_keys
+              - nbde_server_rotate_keys
+              - nbde_server_keys_dir
+            nbde_server_vars_vals: "{{ lookup('vars', *nbde_server_vars) }}"
           when: ansible_version.full is version_compare('2.9', '>=')
+
       always:
         - name: Cleanup
           tags: tests::cleanup
