@@ -201,7 +201,7 @@ can set up tang servers.</p>
 <code>meta/collection-requirements.yml</code>. These are not
 automatically installed. You must install them like this:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ansible-galaxy</span> install <span class="at">-vv</span> <span class="at">-r</span> meta/collection-requirements.yml<span class="kw">`</span></span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ansible-galaxy</span> install <span class="at">-vv</span> <span class="at">-r</span> meta/collection-requirements.yml</span></code></pre></div>
 <h1 id="role-variables">Role Variables</h1>
 <p>These are the variables that can be passed to the role:</p>
 <table>
@@ -227,7 +227,9 @@ able to provision/deploy tang servers.</td>
 <td>indicates the state the nbde_server should be. It can be either
 <code>started</code> (default) or <code>stopped</code>.
 <code>started</code> means the server is accepting connections, whereas
-<code>stopped</code> means it is not accepting connections.</td>
+<code>stopped</code> means it is not accepting connections. Ignored for
+non-booted hosts like container builds, then the service is always
+started at boot.</td>
 </tr>
 <tr>
 <td><code>nbde_server_rotate_keys</code></td>
