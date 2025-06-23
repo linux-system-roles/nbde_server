@@ -1,6 +1,18 @@
 Changelog
 =========
 
+[1.5.0] - 2025-06-23
+--------------------
+
+### New Features
+
+- feat: Support this role in container builds (#188)
+
+### Other Changes
+
+- ci: Add support for bootc end-to-end validation tests (#186)
+- ci: Use ansible 2.19 for fedora 42 testing; support python 3.13 (#187)
+
 [1.4.10] - 2025-05-21
 --------------------
 
