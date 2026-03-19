@@ -10,9 +10,9 @@
     - name: Run tests
       block:
         - name: Accepting connections without specifying state
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
 
         - name: Gather state of services
           service:
@@ -29,10 +29,9 @@
           loop: "{{ nbde_server_state.results }}"
 
         - name: Not accepting connections specifying state stopped
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_service_state: stopped
 
         - name: Gather state of services
@@ -50,10 +49,9 @@
           loop: "{{ nbde_server_state.results }}"
 
         - name: Accepting connections specifying state started
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_service_state: started
 
         - name: Gather state of services

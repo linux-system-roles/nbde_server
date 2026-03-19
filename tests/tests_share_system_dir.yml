@@ -3,7 +3,6 @@
     Ensure that the role can share tangd.socket.d directory with other
     files
   hosts: all
-  gather_facts: false
   vars:
     maxcon_conf: /etc/systemd/system/tangd.socket.d/override2.conf
     tangd_dir_mode: "0775"
@@ -26,9 +25,9 @@
             mode: "{{ tangd_file_mode }}"
 
         - name: Run role
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true  # only need this the first time to get private vars
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true  # only need this the first time to get private vars
 
         - name: Check tangd socket dir
           stat:
@@ -49,8 +48,7 @@
             that: not __nbde_server_custom_dir is changed
 
         - name: Run the role with a custom port
-          include_role:
-            name: linux-system-roles.nbde_server
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
             nbde_server_port: 7500
             nbde_server_firewall_zone: public
@@ -87,8 +85,7 @@
             state: absent
 
         - name: Run the role with default port
-          include_role:
-            name: linux-system-roles.nbde_server
+          include_tasks: tasks/run_role_with_clear_facts.yml
 
         - name: Check tangd socket dir is absent
           stat:

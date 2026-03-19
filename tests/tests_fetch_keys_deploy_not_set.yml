@@ -25,9 +25,9 @@
             nbde_server_keys_dir: "{{ __tmpdir.path }}"
 
         - name: Ensure we have keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
 
         - name: Gather keys
           find:
@@ -39,10 +39,9 @@
           register: nbde_server_host_keys
 
         - name: Run with nbde_server_deploy_keys not set to check the keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_rotate_keys: false
             nbde_server_fetch_keys: true
             nbde_server_deploy_keys: false

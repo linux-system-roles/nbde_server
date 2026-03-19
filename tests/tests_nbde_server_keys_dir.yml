@@ -9,10 +9,9 @@
     - name: Test 1 - only nbde_server_fetch_keys set
       block:
         - name: With nbde_server_fetch_keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_fetch_keys: true
 
         - name: Unreachable task
@@ -32,10 +31,9 @@
     - name: Test 2 - only nbde_server_deploy_keys set
       block:
         - name: With nbde_server_deploy_keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_deploy_keys: true
 
         - name: Unreachable task
@@ -55,10 +53,9 @@
     - name: Test 3 - nbde_server_fetch_keys and nbde_server_deploy_keys set
       block:
         - name: With nbde_server_fetch_keys and deploy keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_fetch_keys: true
             nbde_server_deploy_keys: true
 
@@ -79,10 +76,9 @@
     - name: Test 4 - nbde_server_keys_dir is absolute path
       block:
         - name: Directory starting with ./
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_fetch_keys: true
             nbde_server_keys_dir: ./foobar
 
@@ -103,10 +99,9 @@
     - name: Test 5 - nbde_server_keys_dir is absolute path
       block:
         - name: Directory without leading ./
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_fetch_keys: true
             nbde_server_keys_dir: foobar
 
