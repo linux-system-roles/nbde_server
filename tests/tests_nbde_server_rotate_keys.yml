@@ -10,9 +10,9 @@
     - name: Run tests
       block:
         - name: Ensure we have keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
 
         - name: Gather keys
           find:
@@ -26,10 +26,9 @@
           register: nbde_server_keys
 
         - name: Run with nbde_server_rotate_keys not set to check keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_rotate_keys: false
 
         - name: Gather keys after running with nbde_server_rotate_keys not set
@@ -48,10 +47,9 @@
             that: nbde_server_keys.files == nbde_server_rotate_not_set.files
 
         - name: Run with nbde_server_rotate_keys set to check keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_rotate_keys: true
 
         - name: Gather keys after running with nbde_server_rotate_keys set

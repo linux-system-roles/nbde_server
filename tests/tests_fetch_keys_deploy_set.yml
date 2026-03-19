@@ -30,9 +30,9 @@
             nbde_server_keys_dir: "{{ __tmpdir.path }}"
 
         - name: Ensure we have keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
 
         - name: Gather common keys, from the first host in the inventory
           run_once: true
@@ -45,10 +45,9 @@
           register: nbde_server_host_common_keys
 
         - name: Run with nbde_server_deploy_keys set to check the common keys
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_rotate_keys: false
             nbde_server_fetch_keys: true
             nbde_server_deploy_keys: true

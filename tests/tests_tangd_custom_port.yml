@@ -10,9 +10,9 @@
     - name: Run tests
       block:
         - name: Install with custom port and firewall zone
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
           when: not __bootc_validation | d(false)
 
         # role does not run during bootc QEMU validation, thus some vars are undefined
@@ -80,10 +80,9 @@
 
 
         - name: Install with default port and firewall zone
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
           vars:
+            __sr_public: true
             nbde_server_port: 80
             nbde_server_firewall_zone: public
             nbde_server_manage_firewall: true

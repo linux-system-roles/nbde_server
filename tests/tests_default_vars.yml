@@ -5,9 +5,9 @@
     - name: Run test
       block:
         - name: Run role
-          include_role:
-            name: linux-system-roles.nbde_server
-            public: true
+          include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
 
         - name: Assert that the role declares all parameters in defaults
           assert:
