@@ -66,6 +66,6 @@
       - port: "{{ nbde_server_port }}/tcp"
         zone: "{{ nbde_server_firewall_zone }}"
         state: enabled
-        immediate: true
+        runtime: "{{ __nbde_server_is_booted }}"
         permanent: true
   when: nbde_server_manage_firewall | bool
