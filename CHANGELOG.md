@@ -1,6 +1,17 @@
 Changelog
 =========
 
+[1.6.1] - 2026-05-07
+--------------------
+
+### Bug Fixes
+
+- fix: firewall - use runtime instead of deprecated immediate (#234)
+
+### Other Changes
+
+- ci: Bump actions/github-script from 8 to 9 (#235)
+
 [1.6.0] - 2026-04-28
 --------------------
 
