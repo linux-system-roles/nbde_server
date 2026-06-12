@@ -310,12 +310,20 @@ def set_file_ownership_and_perms(module, target):
         if not listing.endswith(".jwk"):
             continue
         fname = os.path.join(target, listing)
-        # Prevent symlink following attacks - skip symlinks
+        # Defense in depth - skip obvious symlinks
         if os.path.islink(fname):
             continue
-        # Use lchown to avoid following symlinks (defense in depth)
-        os.lchown(fname, uid, gid)
-        os.chmod(fname, 0o400)
+        # Atomically open with O_NOFOLLOW to prevent TOCTOU race
+        try:
+            fd = os.open(fname, os.O_RDONLY | os.O_NOFOLLOW)
+        except (OSError, IOError):
+            # ELOOP (symlink) or EINVAL - skip this file
+            continue
+        try:
+            os.fchown(fd, uid, gid)
+            os.fchmod(fd, 0o400)
+        finally:
+            os.close(fd)
 
 
 def run_module():
