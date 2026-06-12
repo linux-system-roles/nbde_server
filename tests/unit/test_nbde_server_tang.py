@@ -11,6 +11,7 @@ __metaclass__ = type
 
 import errno
 import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -303,8 +304,6 @@ class TestIntegrationSymlinkProtection(unittest.TestCase):
 
     def tearDown(self):
         """Clean up test directory."""
-        import shutil
-
         shutil.rmtree(self.test_dir, ignore_errors=True)
 
     def test_real_symlink_is_skipped(self):
