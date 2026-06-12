@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2024, Red Hat, Inc.
@@ -17,9 +16,9 @@ import tempfile
 import unittest
 
 try:
-    from unittest.mock import MagicMock, Mock, patch, call
+    from unittest.mock import MagicMock, Mock, patch
 except ImportError:
-    from mock import MagicMock, Mock, patch, call
+    from mock import MagicMock, Mock, patch
 
 # Mock Ansible imports before importing the module
 sys.modules["ansible"] = MagicMock()
@@ -75,12 +74,8 @@ class TestSymlinkProtection(unittest.TestCase):
 
         # Verify files were opened with O_NOFOLLOW
         self.assertEqual(mock_open.call_count, 2)
-        mock_open.assert_any_call(
-            "/test/keydir/key1.jwk", os.O_RDONLY | os.O_NOFOLLOW
-        )
-        mock_open.assert_any_call(
-            "/test/keydir/key2.jwk", os.O_RDONLY | os.O_NOFOLLOW
-        )
+        mock_open.assert_any_call("/test/keydir/key1.jwk", os.O_RDONLY | os.O_NOFOLLOW)
+        mock_open.assert_any_call("/test/keydir/key2.jwk", os.O_RDONLY | os.O_NOFOLLOW)
 
         # Verify ownership was changed
         self.assertEqual(mock_fchown.call_count, 2)
@@ -247,9 +242,7 @@ class TestSymlinkProtection(unittest.TestCase):
     @patch("nbde_server_tang.os.path.isdir")
     @patch("nbde_server_tang.get_dir_ownership")
     @patch("nbde_server_tang.os.listdir")
-    def test_non_jwk_files_ignored(
-        self, mock_listdir, mock_get_ownership, mock_isdir
-    ):
+    def test_non_jwk_files_ignored(self, mock_listdir, mock_get_ownership, mock_isdir):
         """Test that non-.jwk files are ignored."""
         mock_isdir.return_value = True
         mock_get_ownership.return_value = (self.uid, self.gid)
@@ -322,8 +315,8 @@ class TestIntegrationSymlinkProtection(unittest.TestCase):
             f.write('{"test": "key"}')
 
         # Create a symlink pointing outside the directory
-        target_file = tempfile.mktemp(prefix="target_")
-        with open(target_file, "w") as f:
+        with tempfile.NamedTemporaryFile(mode="w", prefix="target_", delete=False) as f:
+            target_file = f.name
             f.write("sensitive data")
         symlink_file = os.path.join(self.test_dir, "symlink.jwk")
         os.symlink(target_file, symlink_file)
