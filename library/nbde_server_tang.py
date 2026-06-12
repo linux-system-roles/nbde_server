@@ -310,7 +310,11 @@ def set_file_ownership_and_perms(module, target):
         if not listing.endswith(".jwk"):
             continue
         fname = os.path.join(target, listing)
-        os.chown(fname, uid, gid)
+        # Prevent symlink following attacks - skip symlinks
+        if os.path.islink(fname):
+            continue
+        # Use lchown to avoid following symlinks (defense in depth)
+        os.lchown(fname, uid, gid)
         os.chmod(fname, 0o400)
 
 
