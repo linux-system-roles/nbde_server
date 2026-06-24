@@ -1,6 +1,20 @@
 Changelog
 =========
 
+[1.6.2] - 2026-06-24
+--------------------
+
+### Bug Fixes
+
+- fix: Prevent symlink following privilege escalation in nbde_server_tang module (#240)
+
+### Other Changes
+
+- refactor: use ansible.posix 2.1.X for EL7 compatibility [citest_skip] (#237)
+- ci: Add config file for CodeRabbit with custom rules (#238)
+- ci: Skip reviews for PRs with [citest_skip] in the title (#239)
+- test: remove unused files (#241)
+
 [1.6.1] - 2026-05-07
 --------------------
 
