@@ -6,6 +6,9 @@
 - name: Set version specific variables
   include_tasks: set_vars.yml
 
+- name: Validate role parameters
+  ansible.builtin.include_tasks: assert_role_vars.yml
+
 - name: Include the appropriate provider tasks
   include_tasks: main-{{ nbde_server_provider }}.yml
 

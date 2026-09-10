@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Assert nbde_server_port is within the valid TCP port range
+  ansible.builtin.assert:
+    that:
+      - nbde_server_port | int >= 1
+      - nbde_server_port | int <= 65535
+    fail_msg: >-
+      nbde_server_port must be between 1 and 65535 inclusive,
+      got {{ nbde_server_port }}
+
+- name: Assert nbde_server_keys_dir is set to an absolute path when needed
+  ansible.builtin.assert:
+    that:
+      - >-
+        nbde_server_keys_dir | default('', true) | length > 0
+        and nbde_server_keys_dir is match('^/')
+    fail_msg: >-
+      nbde_server_keys_dir must be set to an absolute path when
+      nbde_server_fetch_keys or nbde_server_deploy_keys is true,
+      got {{ nbde_server_keys_dir | default('', true) }}
+  when: (nbde_server_fetch_keys | bool) or (nbde_server_deploy_keys | bool)
