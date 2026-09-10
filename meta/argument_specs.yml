@@ -1,0 +1,98 @@
+# SPDX-License-Identifier: MIT
+---
+argument_specs:
+  main:
+    short_description: The nbde_server role.
+    description: >
+      The nbde_server role allows you to configure Network-Bound Disk
+      Encryption (NBDE) servers, such as `tang`, that provide encryption
+      keys over the network to clients that need to unlock encrypted
+      volumes.
+
+      This role will install the necessary packages, create or rotate the
+      server's cryptographic keys, optionally fetch or deploy those keys
+      to and from the control node, and manage the firewall and SELinux
+      settings for the server's port as specified below.
+    options:
+      nbde_server_provider:
+        type: str
+        default: tang
+        choices:
+          - tang
+        description: >
+          The provider to use for the NBDE server. Currently only `tang`
+          is supported.
+      nbde_server_service_state:
+        type: str
+        default: started
+        choices:
+          - started
+          - stopped
+        description: >
+          Whether the NBDE server should accept connections (`started`)
+          or not (`stopped`). Ignored on hosts that are not booted with
+          systemd, such as container builds, where the service is always
+          started at boot.
+      nbde_server_rotate_keys:
+        type: bool
+        default: false
+        description: >
+          Whether existing keys should be rotated before new keys are
+          created. When `false`, new keys are created only if none
+          already exist, and any existing keys are left untouched.
+      nbde_server_fetch_keys:
+        type: bool
+        default: false
+        description: >
+          Whether keys should be fetched from the managed hosts to the
+          control node, where they will be placed in
+          `nbde_server_keys_dir`. `nbde_server_keys_dir` must be set
+          when this is `true`.
+      nbde_server_deploy_keys:
+        type: bool
+        default: false
+        description: >
+          Whether the keys located in `nbde_server_keys_dir` on the
+          control node should be deployed to the managed hosts.
+          `nbde_server_keys_dir` must be set when this is `true`.
+      nbde_server_keys_dir:
+        type: path
+        default: ""
+        description: >
+          The directory on the control node that contains keys to be
+          deployed to the managed hosts, or that fetched keys will be
+          placed into. Keys located directly in this directory are
+          deployed to every managed host, while keys located in a
+          subdirectory named after a managed host, such as
+          `nbde_server_keys_dir/host1`, are deployed only to that host.
+          Must be an absolute path. Required when
+          `nbde_server_fetch_keys` or `nbde_server_deploy_keys` is
+          `true`.
+      nbde_server_port:
+        type: int
+        default: 80
+        description: >
+          The TCP port that the NBDE server's firewall should open.
+          `nbde_server_manage_firewall` must be set to `true` to have
+          the role manage the firewall for this port, and
+          `nbde_server_manage_selinux` must be set to `true` to have
+          the role manage SELinux labeling for this port.
+      nbde_server_firewall_zone:
+        type: str
+        default: public
+        description: >
+          The firewalld zone that `nbde_server_port` should be opened
+          in. `nbde_server_manage_firewall` must be set to `true` to
+          change the default zone.
+      nbde_server_manage_firewall:
+        type: bool
+        default: false
+        description: >
+          Whether the role should manage `nbde_server_port` using the
+          `firewall` role.
+      nbde_server_manage_selinux:
+        type: bool
+        default: false
+        description: >
+          Whether the role should manage `nbde_server_port` using the
+          `selinux` role.

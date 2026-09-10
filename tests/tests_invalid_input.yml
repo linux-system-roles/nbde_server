@@ -1,0 +1,348 @@
+# SPDX-License-Identifier: MIT
+---
+- name: Verify invalid parameters are rejected
+  hosts: all
+  tasks:
+    - name: Run invalid input tests
+      block:
+        # ====================================================
+        # Section 1: Verify role works with valid defaults
+        # ====================================================
+        - name: Run role with valid defaults
+          ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+          vars:
+            __sr_public: true
+
+        - name: Mark valid defaults succeeded
+          ansible.builtin.set_fact:
+            __valid_defaults_succeeded: true
+
+        - name: Assert role completed with valid defaults
+          ansible.builtin.assert:
+            that:
+              - __valid_defaults_succeeded | default(false)
+            fail_msg: >-
+              Role should succeed with default parameters
+
+        # ====================================================
+        # Section 2: argument_specs validation (Ansible 2.11+)
+        # ====================================================
+        - name: Run argument specs validation tests
+          when: ansible_version.full is version("2.11", ">=")
+          block:
+            # --- Test: invalid nbde_server_provider choice ---
+            - name: Argument specs reject invalid nbde_server_provider
+              block:
+                - name: Run role with invalid nbde_server_provider value
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_provider: invalid_provider
+              rescue:
+                - name: Mark invalid nbde_server_provider rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_provider_choice_failed: true
+                  when: >-
+                    'nbde_server_provider' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_provider was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_provider_choice_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_provider value
+                  'invalid_provider'
+
+            # --- Test: invalid nbde_server_service_state choice ---
+            - name: Argument specs reject invalid nbde_server_service_state
+              block:
+                - name: Run role with invalid nbde_server_service_state value
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_service_state: invalid_state
+              rescue:
+                - name: Mark invalid nbde_server_service_state rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_service_state_choice_failed: true
+                  when: >-
+                    'nbde_server_service_state' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_service_state was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_service_state_choice_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_service_state
+                  value 'invalid_state'
+
+            # --- Test: invalid nbde_server_rotate_keys type ---
+            - name: Argument specs reject non-boolean nbde_server_rotate_keys
+              block:
+                - name: Run role with non-boolean nbde_server_rotate_keys
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_rotate_keys: not_a_bool
+              rescue:
+                - name: Mark invalid nbde_server_rotate_keys type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_rotate_keys_type_failed: true
+                  when: >-
+                    'nbde_server_rotate_keys' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_rotate_keys type was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_rotate_keys_type_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_rotate_keys
+                  values that are not booleans
+
+            # --- Test: invalid nbde_server_fetch_keys type ---
+            - name: Argument specs reject non-boolean nbde_server_fetch_keys
+              block:
+                - name: Run role with non-boolean nbde_server_fetch_keys
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_fetch_keys: not_a_bool
+              rescue:
+                - name: Mark invalid nbde_server_fetch_keys type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_fetch_keys_type_failed: true
+                  when: >-
+                    'nbde_server_fetch_keys' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_fetch_keys type was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_fetch_keys_type_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_fetch_keys
+                  values that are not booleans
+
+            # --- Test: invalid nbde_server_deploy_keys type ---
+            - name: Argument specs reject non-boolean nbde_server_deploy_keys
+              block:
+                - name: Run role with non-boolean nbde_server_deploy_keys
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_deploy_keys: not_a_bool
+              rescue:
+                - name: Mark invalid nbde_server_deploy_keys type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_deploy_keys_type_failed: true
+                  when: >-
+                    'nbde_server_deploy_keys' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_deploy_keys type was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_deploy_keys_type_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_deploy_keys
+                  values that are not booleans
+
+            # --- Test: invalid nbde_server_manage_firewall type ---
+            - name: Argument specs reject non-boolean nbde_server_manage_firewall
+              block:
+                - name: Run role with non-boolean nbde_server_manage_firewall
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_manage_firewall: not_a_bool
+              rescue:
+                - name: Mark invalid nbde_server_manage_firewall type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_manage_firewall_type_failed: true
+                  when: >-
+                    'nbde_server_manage_firewall' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_manage_firewall type was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_manage_firewall_type_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_manage_firewall
+                  values that are not booleans
+
+            # --- Test: invalid nbde_server_manage_selinux type ---
+            - name: Argument specs reject non-boolean nbde_server_manage_selinux
+              block:
+                - name: Run role with non-boolean nbde_server_manage_selinux
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_manage_selinux: not_a_bool
+              rescue:
+                - name: Mark invalid nbde_server_manage_selinux type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_manage_selinux_type_failed: true
+                  when: >-
+                    'nbde_server_manage_selinux' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_manage_selinux type was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_manage_selinux_type_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_manage_selinux
+                  values that are not booleans
+
+            # --- Test: invalid nbde_server_port type ---
+            - name: Argument specs reject non-integer nbde_server_port
+              block:
+                - name: Run role with non-integer nbde_server_port
+                  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+                  vars:
+                    __sr_public: true
+                    nbde_server_port: not_an_int
+              rescue:
+                - name: Mark invalid nbde_server_port type rejected
+                  ansible.builtin.set_fact:
+                    __invalid_input_port_type_failed: true
+                  when: >-
+                    'nbde_server_port' in
+                    (ansible_failed_result | default({}) | to_json)
+
+            - name: Assert invalid nbde_server_port type was rejected
+              ansible.builtin.assert:
+                that:
+                  - __invalid_input_port_type_failed | default(false)
+                fail_msg: >-
+                  argument_specs should reject nbde_server_port values
+                  that are not integers
+
+        # ====================================================
+        # Section 3: assert_role_vars validation (all versions)
+        # ====================================================
+
+        # --- Test: nbde_server_port below the valid range ---
+        - name: Assert rejects nbde_server_port below the valid range
+          block:
+            - name: Run role with nbde_server_port set to 0
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_public: true
+                nbde_server_port: 0
+          rescue:
+            - name: Mark nbde_server_port below range rejected
+              ansible.builtin.set_fact:
+                __invalid_input_port_low_failed: true
+              when: >-
+                'nbde_server_port must be between' in
+                (ansible_failed_result | default({}) | to_json)
+
+        - name: Assert nbde_server_port below range was rejected
+          ansible.builtin.assert:
+            that:
+              - __invalid_input_port_low_failed | default(false)
+            fail_msg: >-
+              assert_role_vars should reject nbde_server_port values
+              below 1
+
+        # --- Test: nbde_server_port above the valid range ---
+        - name: Assert rejects nbde_server_port above the valid range
+          block:
+            - name: Run role with nbde_server_port set to 65536
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_public: true
+                nbde_server_port: 65536
+          rescue:
+            - name: Mark nbde_server_port above range rejected
+              ansible.builtin.set_fact:
+                __invalid_input_port_high_failed: true
+              when: >-
+                'nbde_server_port must be between' in
+                (ansible_failed_result | default({}) | to_json)
+
+        - name: Assert nbde_server_port above range was rejected
+          ansible.builtin.assert:
+            that:
+              - __invalid_input_port_high_failed | default(false)
+            fail_msg: >-
+              assert_role_vars should reject nbde_server_port values
+              above 65535
+
+        # --- Test: nbde_server_keys_dir missing when nbde_server_fetch_keys is set ---
+        - name: Assert rejects missing nbde_server_keys_dir when fetching keys
+          block:
+            - name: Run role with nbde_server_fetch_keys but no keys_dir
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_public: true
+                nbde_server_fetch_keys: true
+          rescue:
+            - name: Mark missing nbde_server_keys_dir rejected
+              ansible.builtin.set_fact:
+                __invalid_input_keys_dir_missing_failed: true
+              when: >-
+                'nbde_server_keys_dir must be set' in
+                (ansible_failed_result | default({}) | to_json)
+
+        - name: Assert missing nbde_server_keys_dir was rejected
+          ansible.builtin.assert:
+            that:
+              - __invalid_input_keys_dir_missing_failed | default(false)
+            fail_msg: >-
+              assert_role_vars should reject a missing nbde_server_keys_dir
+              when nbde_server_fetch_keys is true
+
+        # --- Test: nbde_server_keys_dir not an absolute path when deploying keys ---
+        - name: Assert rejects relative nbde_server_keys_dir when deploying keys
+          block:
+            - name: Run role with nbde_server_deploy_keys and a relative keys_dir
+              ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+              vars:
+                __sr_public: true
+                nbde_server_deploy_keys: true
+                nbde_server_keys_dir: relative/path
+          rescue:
+            - name: Mark relative nbde_server_keys_dir rejected
+              ansible.builtin.set_fact:
+                __invalid_input_keys_dir_relative_failed: true
+              when: >-
+                'nbde_server_keys_dir must be set' in
+                (ansible_failed_result | default({}) | to_json)
+
+        - name: Assert relative nbde_server_keys_dir was rejected
+          ansible.builtin.assert:
+            that:
+              - __invalid_input_keys_dir_relative_failed | default(false)
+            fail_msg: >-
+              assert_role_vars should reject a relative nbde_server_keys_dir
+              when nbde_server_deploy_keys is true
+
+      always:
+        - name: Clear test facts
+          ansible.builtin.set_fact:
+            __valid_defaults_succeeded:
+            __invalid_input_provider_choice_failed:
+            __invalid_input_service_state_choice_failed:
+            __invalid_input_rotate_keys_type_failed:
+            __invalid_input_fetch_keys_type_failed:
+            __invalid_input_deploy_keys_type_failed:
+            __invalid_input_manage_firewall_type_failed:
+            __invalid_input_manage_selinux_type_failed:
+            __invalid_input_port_type_failed:
+            __invalid_input_port_low_failed:
+            __invalid_input_port_high_failed:
+            __invalid_input_keys_dir_missing_failed:
+            __invalid_input_keys_dir_relative_failed:
+          tags: tests::cleanup
+
+        - name: Cleanup
+          tags: tests::cleanup
+          ansible.builtin.include_tasks: tasks/cleanup.yml
+
+# vim:set ts=2 sw=2 et:
